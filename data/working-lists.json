@@ -2,8 +2,8 @@
   "КМБ-с-о-25-1": {
     "starostaId": "u11",
     "students": [
-      { "id": "s1",  "fullName": "Бабицкий Николай",       "zachetka": "25-0001", "userId": "u1s",  "notes": "", "attendance": {} },
-      { "id": "s2",  "fullName": "Боршакаев Эмиль",        "zachetka": "25-0002", "userId": "u3s",  "notes": "", "attendance": {} },
+      { "id": "s1",  "fullName": "Бабицкий Николай",       "zachetka": "25-0001", "userId": "u1",  "notes": "", "attendance": {} },
+      { "id": "s2",  "fullName": "Боршакаев Эмиль",        "zachetka": "25-0002", "userId": "u3",  "notes": "", "attendance": {} },
       { "id": "s3",  "fullName": "Буянов Владимир",        "zachetka": "25-0003", "userId": "u4",   "notes": "", "attendance": {} },
       { "id": "s4",  "fullName": "Верещака Владислав",     "zachetka": "25-0004", "userId": "u5",   "notes": "", "attendance": {} },
       { "id": "s5",  "fullName": "Водопьянов Кирилл",      "zachetka": "25-0005", "userId": "u6",   "notes": "", "attendance": {} },
