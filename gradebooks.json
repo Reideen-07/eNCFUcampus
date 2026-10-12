@@ -1,0 +1,216 @@
+{
+  "gradebooks": {
+    "u1": {
+      "studentId": "u1",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "хорошо", "date": "2026-01-20", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "отлично", "date": "2026-01-15", "teacher": "Колбин М. Д." },
+            { "subject": "Основы российской государственности", "hours": 72, "grade": "зачтено", "date": "2025-12-23", "teacher": "Попов М. Е." },
+            { "subject": "История России", "hours": 72, "grade": "зачтено", "date": "2025-12-20", "teacher": "Тонян А. А." },
+            { "subject": "Физическая культура", "hours": 72, "grade": "зачтено", "date": "2025-12-19", "teacher": "Касьянов С. В." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u3": {
+      "studentId": "u3",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "удовлетворительно", "date": "2026-01-22", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "хорошо", "date": "2026-01-18", "teacher": "Колбин М. Д." },
+            { "subject": "Основы российской государственности", "hours": 72, "grade": "зачтено", "date": "2025-12-24", "teacher": "Попов М. Е." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u4": {
+      "studentId": "u4",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "отлично", "date": "2026-01-19", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "отлично", "date": "2026-01-16", "teacher": "Колбин М. Д." },
+            { "subject": "История России", "hours": 72, "grade": "зачтено", "date": "2025-12-21", "teacher": "Тонян А. А." },
+            { "subject": "Физическая культура", "hours": 72, "grade": "зачтено", "date": "2025-12-19", "teacher": "Касьянов С. В." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u5": {
+      "studentId": "u5",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "хорошо", "date": "2026-01-21", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "хорошо", "date": "2026-01-17", "teacher": "Колбин М. Д." },
+            { "subject": "Основы российской государственности", "hours": 72, "grade": "зачтено", "date": "2025-12-22", "teacher": "Попов М. Е." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u6": {
+      "studentId": "u6",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "отлично", "date": "2026-01-18", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "отлично", "date": "2026-01-14", "teacher": "Колбин М. Д." },
+            { "subject": "История России", "hours": 72, "grade": "отлично", "date": "2025-12-22", "teacher": "Тонян А. А." },
+            { "subject": "Основы российской государственности", "hours": 72, "grade": "отлично", "date": "2025-12-25", "teacher": "Попов М. Е." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u7": {
+      "studentId": "u7",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "хорошо", "date": "2026-01-20", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "удовлетворительно", "date": "2026-01-19", "teacher": "Колбин М. Д." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u8": {
+      "studentId": "u8",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "хорошо", "date": "2026-01-20", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "хорошо", "date": "2026-01-17", "teacher": "Колбин М. Д." },
+            { "subject": "Физическая культура", "hours": 72, "grade": "зачтено", "date": "2025-12-19", "teacher": "Касьянов С. В." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u9": {
+      "studentId": "u9",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "отлично", "date": "2026-01-15", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "хорошо", "date": "2026-01-16", "teacher": "Колбин М. Д." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    },
+    "u11": {
+      "studentId": "u11",
+      "specialty": { "code": "10.05.01", "name": "Компьютерная безопасность", "level": "Специалитет", "form": "очная" },
+      "enrollmentYear": 2025,
+      "currentYear": 1,
+      "currentSemester": 2,
+      "studyDuration": 5.5,
+      "semesters": [
+        {
+          "year": 1,
+          "semester": 1,
+          "label": "1 курс · 1 семестр",
+          "exams": [],
+          "credits": [
+            { "subject": "Математический анализ", "hours": 252, "grade": "хорошо", "date": "2026-01-20", "teacher": "Тимофеева Е. Ф." },
+            { "subject": "Алгебра и геометрия", "hours": 216, "grade": "отлично", "date": "2026-01-15", "teacher": "Колбин М. Д." },
+            { "subject": "Основы российской государственности", "hours": 72, "grade": "зачтено", "date": "2025-12-23", "teacher": "Попов М. Е." },
+            { "subject": "История России", "hours": 72, "grade": "зачтено", "date": "2025-12-20", "teacher": "Тонян А. А." },
+            { "subject": "Физическая культура", "hours": 72, "grade": "зачтено", "date": "2025-12-19", "teacher": "Касьянов С. В." },
+            { "subject": "Программирование на C++", "hours": 108, "grade": "отлично", "date": "2026-01-25", "teacher": "Свистунов Н. Ю." }
+          ],
+          "practice": [],
+          "reports": []
+        }
+      ]
+    }
+  }
+}

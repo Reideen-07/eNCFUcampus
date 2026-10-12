@@ -1,0 +1,14 @@
+{
+  "links": [
+    { "id": "l1", "category": "Обучение", "title": "ЭИОС СКФУ", "desc": "Электронная информационно-образовательная среда", "url": "https://eios.ncfu.ru/", "icon": "🎓", "color": "#007aff" },
+    { "id": "l2", "category": "Обучение", "title": "Личный кабинет", "desc": "Оценки, зачёты, расписание", "url": "https://ecampus.ncfu.ru/", "icon": "🎒", "color": "#34c759" },
+    { "id": "l3", "category": "Библиотеки", "title": "Научная библиотека СКФУ", "desc": "Каталог, базы данных", "url": "https://lib.ncfu.ru/", "icon": "📚", "color": "#ff9500" },
+    { "id": "l4", "category": "Библиотеки", "title": "ЭБС «Университетская библиотека»", "desc": "Электронные книги", "url": "https://biblioclub.ru/", "icon": "📖", "color": "#af52de" },
+    { "id": "l5", "category": "Библиотеки", "title": "eLibrary", "desc": "Российский индекс цитирования", "url": "https://www.elibrary.ru/", "icon": "📰", "color": "#5856d6" },
+    { "id": "l6", "category": "Библиотеки", "title": "КиберЛенинка", "desc": "Открытая научная библиотека", "url": "https://cyberleninka.ru/", "icon": "📑", "color": "#ff2d55" },
+    { "id": "l7", "category": "Поддержка", "title": "Техподдержка СКФУ", "desc": "Проблемы с eCampus, Wi-Fi, почтой", "url": "https://support.ncfu.ru/", "icon": "🛟", "color": "#ff3b30" },
+    { "id": "l8", "category": "Поддержка", "title": "Официальный сайт СКФУ", "desc": "Новости, объявления", "url": "https://ncfu.ru/", "icon": "🏛️", "color": "#1e3a8a" },
+    { "id": "l9", "category": "Студенту", "title": "Студенческий офис", "desc": "Справки, заявления, документы", "url": "https://ncfu.ru/studentam/", "icon": "🧑‍💼", "color": "#8e8e93" },
+    { "id": "l10", "category": "Студенту", "title": "Профсоюз студентов", "desc": "Стипендии, льготы, мероприятия", "url": "https://ncfu.ru/studentam/profkom/", "icon": "🤝", "color": "#34c759" }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "materials": [
+    {
+      "id": "mat1",
+      "authorId": "u2",
+      "authorName": "Петрова Анна Сергеевна",
+      "group": "КМБ-с-о-25-1",
+      "subject": "Основы информационной безопасности",
+      "title": "Лекция 3: Нормативные документы",
+      "description": "PDF с примерами",
+      "url": "https://example.com/lecture3.pdf",
+      "type": "link",
+      "createdAt": "2026-10-01T12:00:00Z"
+    }
+  ]
+}

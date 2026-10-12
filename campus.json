@@ -1,0 +1,76 @@
+{
+  "campus": [
+    {
+      "id": 1, "name": "Корпус №1", "address": "Улица Пушкина, 1, лит. А1",
+      "coords": [45.04523, 41.97156],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Пушкина%201",
+      "plansFolder": null
+    },
+    {
+      "id": 2, "name": "Корпус №2", "address": "Улица Пушкина, 1, лит. А",
+      "coords": [45.04498, 41.97123],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Пушкина%201",
+      "plansFolder": null
+    },
+    {
+      "id": 3, "name": "Корпус №3", "address": "Улица Пушкина, 1, лит. Р-Р1",
+      "coords": [45.04451, 41.97210],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Пушкина%201",
+      "plansFolder": null
+    },
+    {
+      "id": 4, "name": "Корпус №4", "address": "Улица Пушкина, 1, лит. У",
+      "coords": [45.04487, 41.97245],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Пушкина%201",
+      "plansFolder": null
+    },
+    {
+      "id": 5, "name": "Корпус №5", "address": "Улица Дзержинского, 153",
+      "coords": [45.04316, 41.96891],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Дзержинского%20153",
+      "plansFolder": null
+    },
+    {
+      "id": 6, "name": "Корпус №6", "address": "Площадь Ленина, 3А",
+      "coords": [45.04266, 41.97078],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20площадь%20Ленина%203А",
+      "plansFolder": null
+    },
+    {
+      "id": 7, "name": "Корпус №7", "address": "Улица Маршала Жукова, 9",
+      "coords": [45.04028, 41.97576],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Маршала%20Жукова%209",
+      "plansFolder": null
+    },
+    {
+      "id": 8, "name": "Корпус №8", "address": "Улица Ленина, 133Б",
+      "coords": [45.03825, 41.96494],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20улица%20Ленина%20133Б",
+      "plansFolder": null
+    },
+    {
+      "id": 9, "name": "Корпус №9", "address": "Проспект Кулакова, 2, лит. А, Б, В",
+      "coords": [45.03650, 41.91176],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20проспект%20Кулакова%202",
+      "plansFolder": "k9"
+    },
+    {
+      "id": 10, "name": "Корпус №10", "address": "Проспект Кулакова, 2, лит. Ж",
+      "coords": [45.03689, 41.91110],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20проспект%20Кулакова%202",
+      "plansFolder": null
+    },
+    {
+      "id": 11, "name": "Корпус №11", "address": "Проспект Кулакова, 2, лит. Д",
+      "coords": [45.03720, 41.91075],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20проспект%20Кулакова%202",
+      "plansFolder": null
+    },
+    {
+      "id": 12, "name": "Корпус №12", "address": "Проспект Кулакова, 2, лит. Е, З",
+      "coords": [45.03760, 41.91042],
+      "mapUrl": "https://yandex.ru/maps/?text=Ставрополь%20проспект%20Кулакова%202",
+      "plansFolder": null
+    }
+  ]
+}

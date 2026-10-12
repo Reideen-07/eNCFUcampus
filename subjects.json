@@ -1,0 +1,38 @@
+{
+  "subjects": {
+    "КМБ-с-о-25-1": {
+      "specialty": "Компьютерная безопасность (специалитет, 5.5 лет)",
+      "totalYears": 6,
+      "courses": {
+        "1": [
+          { "name": "Математический анализ", "teacher": "Тимофеева Е. Ф.", "exam": "Экзамен", "hasLectures": true, "hasPractice": true },
+          { "name": "Алгебра и геометрия", "teacher": "Колбин М. Д.", "exam": "Экзамен", "hasLectures": true, "hasPractice": true },
+          { "name": "Основы информационной безопасности", "teacher": "Петрова А. С.", "exam": "Зачёт", "hasLectures": true, "hasPractice": true },
+          { "name": "Программирование на C++", "teacher": "Свистунов Н. Ю.", "exam": "Диф. зачёт", "hasLectures": true, "hasLabs": true },
+          { "name": "Дискретная математика", "teacher": "Кучуков В. А.", "exam": "Экзамен", "hasLectures": true, "hasPractice": true },
+          { "name": "Иностранный язык", "teacher": "Елисеева Ю. В.", "exam": "Зачёт", "hasPractice": true },
+          { "name": "История России", "teacher": "Тонян А. А.", "exam": "Зачёт", "hasLectures": true, "hasSeminars": true },
+          { "name": "Основы российской государственности", "teacher": "Попов М. Е.", "exam": "Зачёт", "hasLectures": true, "hasSeminars": true },
+          { "name": "Физическая культура", "teacher": "Касьянов С. В.", "exam": "Зачёт", "hasPractice": true },
+          { "name": "Введение в информационные технологии", "teacher": "Палащенко В. Н.", "exam": "Зачёт", "hasLabs": true },
+          { "name": "Правовая и финансовая грамотность", "teacher": "Грудинина В. А.", "exam": "Зачёт", "hasLectures": true }
+        ],
+        "2": [
+          { "name": "Математический анализ", "teacher": "Тимофеева Е. Ф.", "exam": "Экзамен", "hasLectures": true, "hasPractice": true },
+          { "name": "Алгебра и геометрия", "teacher": "Колбин М. Д.", "exam": "Экзамен", "hasLectures": true, "hasPractice": true },
+          { "name": "Программирование на C++", "teacher": "Свистунов Н. Ю.", "exam": "Экзамен", "hasLectures": true, "hasLabs": true },
+          { "name": "Теория вероятностей и математическая статистика", "teacher": "Обласова И. Н.", "exam": "Зачёт", "hasLectures": true, "hasPractice": true },
+          { "name": "Физика", "teacher": "Мартенс В. Я.", "exam": "Экзамен", "hasLectures": true, "hasLabs": true },
+          { "name": "Иностранный язык", "teacher": "Елисеева Ю. В.", "exam": "Зачёт", "hasPractice": true },
+          { "name": "Физическая культура", "teacher": "Касьянов С. В.", "exam": "Зачёт", "hasPractice": true }
+        ],
+        "3": [
+          { "name": "Криптография", "teacher": "Рябцев С. С.", "exam": "Экзамен", "hasLectures": true, "hasLabs": true },
+          { "name": "Безопасность операционных систем", "teacher": "Петрова А. С.", "exam": "Экзамен", "hasLectures": true, "hasLabs": true },
+          { "name": "Сети и телекоммуникации", "teacher": "Свистунов Н. Ю.", "exam": "Диф. зачёт", "hasLectures": true, "hasLabs": true },
+          { "name": "Базы данных", "teacher": "Петрова А. С.", "exam": "Экзамен", "hasLectures": true, "hasLabs": true }
+        ]
+      }
+    }
+  }
+}
