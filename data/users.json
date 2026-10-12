@@ -22,7 +22,7 @@
         {
           "day": "mon",
           "start": "14:00",
-          "end": "16:00",
+          "end": "16:00", 
           "place": "9-431"
         },
         {
@@ -59,7 +59,7 @@
       "socials": []
     },
     {
-      "id": "u1s",
+      "id": "u1",
       "login": "babickiy",
       "password": "1234",
       "fullName": "Бабицкий Николай",
@@ -75,7 +75,7 @@
       "socials": []
     },
     {
-      "id": "u3s",
+      "id": "u3",
       "login": "borshakaev",
       "password": "1234",
       "fullName": "Боршакаев Эмиль",
