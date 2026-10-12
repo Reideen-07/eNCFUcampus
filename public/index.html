@@ -161,11 +161,25 @@
     font-size: 15px; color: #fff; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
   }
   .header .user-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-  .header .user-info .group { background: rgba(0, 122, 255, 0.12); color: var(--accent); padding: 6px 13px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+  .header .user-info .group {
+  background: rgba(0, 122, 255, 0.12);
+  color: var(--accent);
+  padding: 8px 15px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  box-sizing: border-box;
+  }
   .header .user-info button {
     background: var(--gray-bg); color: var(--text); border: none;
     padding: 8px 15px; border-radius: 100px; cursor: pointer;
     font-size: 13px; font-weight: 500; font-family: inherit;
+    min-height: 32px; box-sizing: border-box;
+    display: inline-flex; align-items: center;
   }
   .page-title {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -607,6 +621,7 @@
     </div>
     <div class='user-info'>
       <span class='group' id='me-group'></span>
+      <button id='inbox-btn' class='hidden'>Входящие</button>
       <button id='logout-btn'>Выйти</button>
     </div>
   </div>
@@ -840,7 +855,6 @@ var TABS_TEACHER = [
   { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
   { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
   { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
-  { key: 'inbox', label: 'Входящие', title: 'Входящие', subtitle: 'Сообщения и объявления', accent: 'var(--tab-accent-events)', icon: 'megaphone' },
   { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
 ];
 
@@ -1466,7 +1480,14 @@ async function renderTeacherSchedule() {
       el('button', { class: 'schedule-group-back', text: '← к расписанию группы', onclick: function() {
         state.viewingTeacher = null; state.teacherScheduleOffset = 0; renderSchedule();
       }})
-    ])
+    ]),
+    // НОВАЯ КНОПКА — профиль преподавателя
+    el('button', {
+      class: 'schedule-search-btn',
+      title: 'Профиль преподавателя',
+      html: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>',
+      onclick: function() { openUserProfile(state.viewingTeacher); }
+    })
   ]));
   main.appendChild(topGroup);
 
@@ -2145,6 +2166,7 @@ async function renderServices() {
 }
 async function openService(key) {
   switch (key) {
+    case 'inbox': await renderAnnouncements(); break;   // или renderInbox — что у тебя
     case 'search': switchTab('search'); break;
     case 'subjects': switchTab('subjects'); break;
     case 'rating': switchTab('rating'); break;
@@ -2658,6 +2680,31 @@ async function openUserProfile(userId) {
         el('button', { class: 'btn btn-secondary', style: 'width: 100%;', text: '📊 Полная статистика', onclick: function() { overlay.remove(); openFullStats(userId); } })
       ]));
     }
+    // Приёмные часы (для преподавателя)
+    if (officeHours && officeHours.length) {
+      var ohWrap = el('div', { style: 'padding: 8px 20px 12px; border-top: 1px solid var(--separator);' });
+      ohWrap.appendChild(el('div', { style: 'font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;', text: 'Приёмные часы' }));
+      officeHours.forEach(function(o) {
+        ohWrap.appendChild(el('div', { style: 'display:flex; justify-content:space-between; padding: 6px 0; font-size: 14px;' }, [
+          el('span', { style: 'color:var(--text-secondary);', text: formatDayName(o.day) + ' · ' + o.start + '–' + o.end }),
+          el('span', { text: o.place || '', style: 'font-weight:500;' })
+        ]));
+      });
+      pop.appendChild(ohWrap);
+    }
+
+    // Консультации (для преподавателя)
+    if (consultations && consultations.length) {
+      var cWrap = el('div', { style: 'padding: 8px 20px 12px; border-top: 1px solid var(--separator);' });
+      cWrap.appendChild(el('div', { style: 'font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;', text: 'Консультации' }));
+      consultations.forEach(function(c) {
+        cWrap.appendChild(el('div', { style: 'padding: 8px 0; border-bottom: 1px solid var(--separator);' }, [
+          el('div', { style: 'font-weight:600; font-size:14px;', text: c.title }),
+          el('div', { style: 'font-size:12px; color:var(--text-secondary); margin-top:2px;', text: formatDate(c.date) + (c.time ? ' · ' + c.time : '') + (c.place ? ' · ' + c.place : '') })
+        ]));
+      });
+      pop.appendChild(cWrap);
+    }
   } catch(e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
 }
 
@@ -3038,6 +3085,9 @@ async function enterApp() {
   buildTabBar();
   var tabs = getTabs();
   switchTab(tabs[0].key);
+  if (state.user.role === 'teacher' || state.user.role === 'curator') {
+    document.getElementById('inbox-btn').classList.remove('hidden');
+  }
 }
 
 document.getElementById('login-btn').addEventListener('click', function() {
@@ -3048,6 +3098,12 @@ document.getElementById('login-btn').addEventListener('click', function() {
 });
 document.getElementById('password-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
 document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('inbox-btn').addEventListener('click', function() {
+  state.currentTab = 'inbox';
+  document.getElementById('page-title-text').textContent = 'Входящие';
+  document.getElementById('page-subtitle').textContent = '';
+  renderCurrentTab();
+});
 window.addEventListener('scroll', function() { document.body.classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
 applyTheme(localStorage.getItem('theme') || 'system');
 (async function init() {
