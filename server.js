@@ -1504,7 +1504,7 @@ app.get('/api/curator/student/:id/summary', auth, requireRole('curator'), async 
   res.json(result);
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
 });
