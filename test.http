@@ -1,0 +1,80 @@
+### Переменные
+@host = http://localhost:3000
+@token = emiwdudwr6lmu79nwfb
+### 1. Логин старосты
+POST {{host}}/api/login
+Content-Type: application/json
+
+{
+  "login": "ivanov",
+  "password": "1234"
+}
+
+### 2. Кто я
+GET {{host}}/api/me
+Authorization: Bearer {{token}}
+
+### 3. Официальный список группы
+GET {{host}}/api/groups/ПИ-21-1/official
+Authorization: Bearer {{token}}
+
+### 4. Рабочий список группы (только староста)
+GET {{host}}/api/groups/ПИ-21-1/working
+Authorization: Bearer {{token}}
+
+### 5. Отметить посещаемость s1
+POST {{host}}/api/groups/ПИ-21-1/working/s1/attendance
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "date": "2026-09-18",
+  "status": "absent"
+}
+
+### 6. Добавить заметку студенту s2
+PATCH {{host}}/api/groups/ПИ-21-1/working/s2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "notes": "Болеет, справка до 25.09"
+}
+
+### 7. Все события группы
+GET {{host}}/api/groups/ПИ-21-1/events
+Authorization: Bearer {{token}}
+
+### 8. Добавить событие
+POST {{host}}/api/groups/ПИ-21-1/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Собрание",
+  "date": "2026-09-25",
+  "time": "15:00",
+  "description": "Обсудить практику"
+}
+
+### 9. Список преподавателей
+GET {{host}}/api/teachers
+Authorization: Bearer {{token}}
+
+### 10. Написать преподавателю u2
+POST {{host}}/api/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "toId": "u2",
+  "text": "Анна Сергеевна, добрый день!"
+}
+
+### 11. Мои диалоги
+GET {{host}}/api/messages/dialogs
+Authorization: Bearer {{token}}
+
+### 12. Переписка с u2
+GET {{host}}/api/messages/with/u2
+Authorization: Bearer {{token}}
