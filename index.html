@@ -1,0 +1,3060 @@
+<!DOCTYPE html>
+<html lang='ru'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, viewport-fit=cover'>
+<meta name='theme-color' content='#f2f2f7'>
+<title>СКФУ</title>
+<style>
+  :root {
+    --bg-base: #f2f2f7;
+    --bg-grad-1: rgba(0, 122, 255, 0.10);
+    --bg-grad-2: rgba(175, 82, 222, 0.08);
+    --bg-grad-3: rgba(255, 149, 0, 0.06);
+    --text: #000;
+    --text-secondary: rgba(60, 60, 67, 0.6);
+    --text-tertiary: rgba(60, 60, 67, 0.3);
+    --accent: #007aff;
+    --accent-hover: #0066d6;
+    --green: #34c759;
+    --red: #ff3b30;
+    --orange: #ff9500;
+    --purple: #af52de;
+    --indigo: #5856d6;
+    --yellow: #ffcc00;
+    --glass-blur: 24px;
+    --glass-sat: 1.8;
+    --glass-border-light: rgba(255, 255, 255, 0.55);
+    --glass-bg-light: rgba(255, 255, 255, 0.68);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.03), 0 12px 40px rgba(0,0,0,0.08);
+    --shadow-float: 0 12px 40px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+    --radius-card: 22px;
+    --radius-pill: 100px;
+    --gray-bg: rgba(120, 120, 128, 0.12);
+    --separator: rgba(60, 60, 67, 0.10);
+    --separator-opaque: rgba(60, 60, 67, 0.22);
+    --tab-accent: var(--accent);
+    --tab-accent-home: #007aff;
+    --tab-accent-journal: #34c759;
+    --tab-accent-events: #ff9500;
+    --tab-accent-starostas: #5856d6;
+    --tab-accent-services: #ff2d55;
+    --tab-accent-settings: #8e8e93;
+  }
+  html[data-theme='dark'] {
+    --bg-base: #000;
+    --bg-grad-1: rgba(10, 132, 255, 0.16);
+    --bg-grad-2: rgba(191, 90, 242, 0.12);
+    --bg-grad-3: rgba(255, 159, 10, 0.08);
+    --text: #fff;
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    --text-tertiary: rgba(235, 235, 245, 0.3);
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --green: #30d158;
+    --red: #ff453a;
+    --orange: #ff9f0a;
+    --purple: #bf5af2;
+    --indigo: #5e5ce6;
+    --yellow: #ffd60a;
+    --glass-border-light: rgba(255, 255, 255, 0.14);
+    --glass-bg-light: rgba(28, 28, 30, 0.62);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.4), 0 12px 40px rgba(0,0,0,0.5);
+    --shadow-float: 0 12px 40px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
+    --gray-bg: rgba(120, 120, 128, 0.24);
+    --separator: rgba(84, 84, 88, 0.34);
+    --separator-opaque: rgba(84, 84, 88, 0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--bg-base); color: var(--text);
+    min-height: 100vh; font-size: 16px; line-height: 1.4;
+    letter-spacing: -0.022em; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: -20%;
+    background:
+      radial-gradient(circle at 20% 15%, var(--bg-grad-1) 0%, transparent 45%),
+      radial-gradient(circle at 80% 25%, var(--bg-grad-2) 0%, transparent 45%),
+      radial-gradient(circle at 50% 85%, var(--bg-grad-3) 0%, transparent 50%),
+      radial-gradient(circle at 90% 90%, var(--bg-grad-1) 0%, transparent 40%);
+    z-index: -1; pointer-events: none;
+    animation: bgFloat 24s ease-in-out infinite;
+  }
+  @keyframes bgFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(3%, -2%) scale(1.05); }
+    66% { transform: translate(-2%, 3%) scale(1.02); }
+  }
+  .hidden { display: none !important; }
+  #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+  .login-card {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-highlight), var(--shadow-float);
+    padding: 44px 30px; border-radius: 32px;
+    width: 100%; max-width: 400px;
+    animation: appear 0.6s cubic-bezier(0.16, 1, 0.3, 1); text-align: center;
+  }
+  @keyframes appear { from { opacity: 0; transform: translateY(30px) scale(0.94); } to { opacity: 1; transform: none; } }
+  .login-card .logo {
+    width: 78px; height: 78px; border-radius: 22px;
+    background: linear-gradient(160deg, #0a84ff 0%, #5e5ce6 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; margin: 0 auto 22px;
+    box-shadow: 0 16px 40px rgba(10, 132, 255, 0.35);
+  }
+  .login-card h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 6px; }
+  .login-card .subtitle { color: var(--text-secondary); margin-bottom: 28px; font-size: 15px; }
+  .login-card input {
+    width: 100%; padding: 16px 18px; border: 1px solid transparent;
+    background: var(--gray-bg); border-radius: 14px;
+    font-size: 16px; font-family: inherit;
+    margin-bottom: 10px; transition: all 0.2s ease;
+    color: var(--text); text-align: left;
+  }
+  .login-card input:focus {
+    outline: none; background: var(--glass-bg-light);
+    border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.18);
+  }
+  .login-card input::placeholder { color: var(--text-tertiary); }
+  .login-card #login-btn {
+    width: 100%; padding: 16px; background: var(--accent); color: #fff;
+    border: none; border-radius: 14px; font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s ease; margin-top: 12px;
+    font-family: inherit; box-shadow: 0 8px 24px rgba(0, 122, 255, 0.35);
+  }
+  .login-card #login-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .login-card #login-btn:disabled { background: #c7c7cc; cursor: wait; box-shadow: none; }
+  .login-hint { margin-top: 24px; font-size: 12px; color: var(--text-tertiary); line-height: 2; }
+  .login-hint code {
+    background: var(--gray-bg); padding: 3px 9px; border-radius: 7px;
+    font-size: 12px; font-family: 'SF Mono', Monaco, monospace; color: var(--text-secondary);
+  }
+  .error-msg {
+    background: rgba(255, 59, 48, 0.12); color: var(--red); padding: 12px 14px;
+    border-radius: 14px; font-size: 13px; margin-bottom: 12px; font-weight: 500;
+  }
+  #app-screen { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 120px; max-width: 1200px; margin: 0 auto; width: 100%; }
+  .header {
+    position: sticky; top: 14px; z-index: 100; margin: 14px 16px 0;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-highlight), var(--shadow-card);
+    border-radius: var(--radius-pill); padding: 10px 16px 10px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header .brand { font-weight: 700; font-size: 15px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+  .header .brand .dot {
+    width: 30px; height: 30px; border-radius: 10px;
+    background: linear-gradient(160deg, #0a84ff 0%, #5e5ce6 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: #fff; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
+  }
+  .header .user-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .header .user-info .group { background: rgba(0, 122, 255, 0.12); color: var(--accent); padding: 6px 13px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+  .header .user-info button {
+    background: var(--gray-bg); color: var(--text); border: none;
+    padding: 8px 15px; border-radius: 100px; cursor: pointer;
+    font-size: 13px; font-weight: 500; font-family: inherit;
+  }
+  .page-title {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: sticky; top: 78px; z-index: 50; padding: 32px 24px 12px;
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-base) 70%, transparent 100%);
+    pointer-events: none;
+  }
+  .page-title h1 { font-size: 40px; color: var(--tab-accent); transition: font-size 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s ease; line-height: 1.15; }
+  .page-title p { color: var(--text-secondary); font-size: 15px; margin-top: 4px; transition: opacity 0.3s ease, max-height 0.3s ease; overflow: hidden; max-height: 30px; }
+  body.scrolled .page-title { padding: 12px 24px 8px; }
+  body.scrolled .page-title h1 { font-size: 22px; }
+  body.scrolled .page-title p { opacity: 0; max-height: 0; }
+  main { padding: 0 16px; flex: 1; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .group {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-highlight), var(--shadow-card);
+    border-radius: var(--radius-card);
+    margin-bottom: 20px; overflow: hidden;
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .group:nth-child(1) { animation-delay: 0s; }
+  .group:nth-child(2) { animation-delay: 0.06s; }
+  .group:nth-child(3) { animation-delay: 0.12s; }
+  .group:nth-child(4) { animation-delay: 0.18s; }
+  .group:nth-child(5) { animation-delay: 0.24s; }
+  .group:nth-child(6) { animation-delay: 0.3s; }
+  .group-header { padding: 16px 20px 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .group-header .badge { padding: 4px 11px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.01em; text-transform: none; }
+  .badge-readonly { background: rgba(88, 86, 214, 0.14); color: var(--indigo); }
+  .badge-editable { background: rgba(52, 199, 89, 0.14); color: var(--green); }
+  .badge-important { background: rgba(255, 59, 48, 0.14); color: var(--red); }
+  .group-body { padding: 8px 0; }
+  .row { display: flex; align-items: center; padding: 14px 20px; gap: 12px; transition: background 0.15s ease; }
+  .row + .row { border-top: 1px solid var(--separator); }
+  .row.clickable { cursor: pointer; }
+  .row.clickable:hover { background: rgba(120, 120, 128, 0.06); }
+  .row.clickable:active { background: rgba(120, 120, 128, 0.12); }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(160deg, #0a84ff, #5e5ce6);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; flex-shrink: 0;
+    letter-spacing: -0.02em; overflow: hidden;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar.sm { width: 34px; height: 34px; font-size: 12px; }
+  .avatar.lg { width: 100px; height: 100px; font-size: 34px; border-radius: 28px; }
+  .row .idx { width: 30px; height: 30px; border-radius: 50%; background: var(--gray-bg); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .row .name { flex: 1; font-weight: 500; font-size: 15px; }
+  .row .zach { font-size: 13px; color: var(--text-secondary); font-family: 'SF Mono', Monaco, monospace; }
+  .row .chevron { color: var(--text-tertiary); font-size: 20px; font-weight: 300; }
+
+  .social-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--separator); }
+  .social-row:first-of-type { border-top: none; }
+  .social-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .social-icon.sm { width: 32px; height: 32px; font-size: 15px; border-radius: 10px; }
+  .social-info { flex: 1; min-width: 0; }
+  .social-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; margin-bottom: 2px; }
+  .social-value { font-size: 14px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .social-actions { display: flex; gap: 4px; }
+  .social-btn { background: transparent; border: none; width: 32px; height: 32px; border-radius: 10px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+  .social-btn.danger { color: var(--red); }
+  .social-row-compact { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+
+  .journal-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--separator); gap: 12px; flex-wrap: wrap; }
+  .journal-toolbar .range { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .journal-toolbar .nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .journal-toolbar button { background: var(--gray-bg); border: none; padding: 9px 15px; border-radius: 100px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text); font-family: inherit; }
+  .journal-toolbar button.primary { background: var(--accent); color: #fff; }
+  .journal-wrapper { overflow-x: auto; max-width: 100%; }
+  .journal { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 14px; user-select: none; }
+  .journal th, .journal td { padding: 0; text-align: center; border-right: 1px solid var(--separator); border-bottom: 1px solid var(--separator); }
+  .journal th:last-child, .journal td:last-child { border-right: none; }
+  .journal tr:last-child td { border-bottom: none; }
+  .journal thead th { background: #f2f2f7; position: sticky; top: 0; z-index: 2; }
+  html[data-theme='dark'] .journal thead th { background: #1c1c1e; }
+  .journal th.date-cell { padding: 8px 4px; min-width: 54px; font-weight: 600; }
+  .journal th.date-cell .weekday { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; font-weight: 500; }
+  .journal th.date-cell .day { font-size: 15px; color: var(--text); margin-top: 1px; }
+  .journal th.date-cell.today .day { color: var(--accent); font-weight: 700; }
+  .journal th.name-col, .journal td.name-col {
+    text-align: left; padding: 12px 16px; min-width: 220px; max-width: 260px;
+    position: sticky; left: 0;
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    z-index: 3; border-right: 1px solid var(--separator-opaque);
+    font-size: 14px; font-weight: 500;
+    box-shadow: 12px 0 16px -8px rgba(0, 0, 0, 0.12);
+  }
+  html[data-theme='dark'] .journal th.name-col, html[data-theme='dark'] .journal td.name-col {
+    box-shadow: 12px 0 16px -8px rgba(0, 0, 0, 0.5);
+  }
+  .journal thead th.name-col { background: #f2f2f7; z-index: 4; padding: 10px 16px; font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.06em; }
+  html[data-theme='dark'] .journal thead th.name-col { background: #1c1c1e; }
+  .journal tbody tr.self-row td { background: rgba(0, 122, 255, 0.07); }
+  .journal tbody tr.self-row td.name-col { background: rgba(0, 122, 255, 0.12); }
+  .journal td.name-col { cursor: pointer; }
+  .journal tbody tr:hover td:not(.name-col):not(.readonly) { background: rgba(0, 122, 255, 0.05); }
+  .journal td.att-cell { width: 54px; min-width: 54px; height: 46px; cursor: pointer; }
+  .journal td.att-cell.readonly { cursor: default; }
+  .journal td.att-cell .status-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    font-size: 12px; font-weight: 700; color: #fff;
+    animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .status-badge.absent { background: var(--red); }
+  .status-badge.excused { background: var(--indigo); }
+  .status-badge.drone { background: var(--orange); }
+  .status-badge.grade-5 { background: var(--green); }
+  .status-badge.grade-4 { background: var(--accent); }
+  .status-badge.grade-3 { background: var(--orange); }
+  .status-badge.grade-2 { background: var(--red); }
+
+  .popover-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .popover {
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(40px) saturate(2);
+    -webkit-backdrop-filter: blur(40px) saturate(2);
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-highlight), 0 24px 80px rgba(0, 0, 0, 0.3);
+    border-radius: 26px; padding: 8px;
+    min-width: 280px; max-width: 440px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .popover-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--separator); margin-bottom: 6px; }
+  .popover-header h3 { font-size: 16px; font-weight: 600; }
+  .popover-header p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .popover-item { display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 500; }
+  .popover-item:hover { background: rgba(120, 120, 128, 0.12); }
+  .popover-item .icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .popover-item.absent .icon { background: var(--red); }
+  .popover-item.excused .icon { background: var(--indigo); }
+  .popover-item.drone .icon { background: var(--orange); }
+  .popover-item.clear .icon { background: var(--text-tertiary); }
+  .popover-item .label { flex: 1; }
+  .popover-item .check { color: var(--accent); font-weight: 700; }
+
+  .profile-hero { display: flex; flex-direction: column; align-items: center; padding: 34px 20px 26px; text-align: center; }
+  .profile-hero h2 { font-size: 24px; font-weight: 700; margin-top: 16px; }
+  .profile-hero .role { color: var(--text-secondary); font-size: 14px; margin-top: 2px; }
+  .profile-hero .badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+  .profile-hero .badges .pill { background: rgba(0, 122, 255, 0.12); color: var(--accent); padding: 6px 13px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 16px 20px; }
+  .stat-cell { background: var(--gray-bg); border-radius: 16px; padding: 14px 10px; text-align: center; }
+  .stat-cell .num { font-size: 24px; font-weight: 700; }
+  .stat-cell .lbl { font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-transform: uppercase; }
+  .stat-cell.red .num { color: var(--red); }
+  .stat-cell.orange .num { color: var(--orange); }
+  .stat-cell.indigo .num { color: var(--indigo); }
+
+  .hero-card {
+    background: linear-gradient(160deg, #0a84ff 0%, #5e5ce6 100%);
+    border-radius: var(--radius-card);
+    padding: 26px; color: #fff; margin-bottom: 20px;
+    box-shadow: 0 20px 50px rgba(10, 132, 255, 0.4);
+    position: relative; overflow: hidden;
+  }
+  .hero-card .lbl { font-size: 13px; opacity: 0.85; text-transform: uppercase; font-weight: 600; }
+  .hero-card .big { font-size: 60px; font-weight: 700; line-height: 1; margin-top: 10px; }
+  .hero-card .big span { font-size: 30px; opacity: 0.75; }
+  .hero-card .sub { font-size: 14px; opacity: 0.9; margin-top: 6px; }
+  .hero-card .row-stats { display: flex; gap: 22px; margin-top: 22px; flex-wrap: wrap; }
+  .hero-card .row-stats .stat { display: flex; flex-direction: column; }
+  .hero-card .row-stats .stat .num { font-size: 22px; font-weight: 700; }
+  .hero-card .row-stats .stat .lbl2 { font-size: 11px; opacity: 0.75; text-transform: uppercase; }
+
+  .form-group { padding: 14px 20px; border-bottom: 1px solid var(--separator); display: flex; align-items: center; gap: 14px; }
+  .form-group:last-child { border-bottom: none; }
+  .form-group label { min-width: 110px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .form-group input, .form-group textarea, .form-group select {
+    flex: 1; padding: 11px 15px; border: 1px solid transparent;
+    background: var(--gray-bg); border-radius: 12px;
+    font-size: 15px; font-family: inherit; color: var(--text); min-width: 0;
+  }
+  .form-group textarea { min-height: 60px; resize: vertical; }
+  .form-actions { padding: 14px 20px; display: flex; justify-content: flex-end; gap: 8px; }
+  .btn { background: var(--accent); color: #fff; border: none; padding: 12px 26px; border-radius: 100px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-secondary { background: var(--gray-bg); color: var(--text); }
+
+  .event-row { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; border-top: 1px solid var(--separator); }
+  .event-row:first-child { border-top: none; }
+  .event-row .event-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 7px; flex-shrink: 0; }
+  .event-row .event-dot.important { background: var(--red); }
+  .event-row .event-content { flex: 1; min-width: 0; }
+  .event-row .event-content h4 { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .event-row .event-content p { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .event-row .event-content .date { font-size: 12px; color: var(--accent); font-weight: 600; }
+  .event-row .delete-btn { background: transparent; border: none; color: var(--red); cursor: pointer; font-size: 14px; padding: 5px 10px; font-family: inherit; }
+
+  .schedule-top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; gap: 12px; flex-wrap: wrap; }
+  .schedule-top-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  .schedule-group-code { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+  .schedule-group-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .schedule-group-back { background: transparent; border: none; color: var(--accent); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; padding: 0; text-align: left; }
+  .schedule-search-btn { background: var(--gray-bg); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: inherit; }
+  .schedule-search-btn:hover { background: rgba(120, 120, 128, 0.2); }
+  .schedule-teacher-btn { background: transparent; border: none; color: var(--accent); font-size: inherit; font-family: inherit; padding: 0; cursor: pointer; text-decoration: none; font-weight: 600; }
+  .schedule-teacher-btn:hover { text-decoration: underline; }
+
+  .group-search-input { width: calc(100% - 32px); margin: 8px 16px 12px; padding: 12px 14px; border: 1px solid var(--glass-border-light); background: var(--gray-bg); border-radius: 12px; font-family: inherit; font-size: 14px; color: var(--text); }
+  .group-search-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); }
+  .groups-list { max-height: 55vh; overflow-y: auto; padding: 4px 8px 8px; }
+  .group-picker-faculty { padding: 12px 8px 6px; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+  .group-picker-item { padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: background 0.15s ease; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .group-picker-item:hover { background: rgba(120, 120, 128, 0.12); }
+  .group-picker-item.own { background: rgba(0, 122, 255, 0.08); }
+  .group-picker-code { font-size: 14px; font-weight: 700; color: var(--text); min-width: 80px; }
+  .group-picker-meta { font-size: 12px; color: var(--text-secondary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .group-picker-own { font-size: 10px; font-weight: 700; padding: 2px 7px; background: rgba(0, 122, 255, 0.15); color: var(--accent); border-radius: 100px; text-transform: uppercase; }
+
+  .schedule-week-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--separator); }
+  .schedule-arrow { background: var(--gray-bg); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 22px; font-weight: 600; color: var(--text); font-family: inherit; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; line-height: 1; }
+  .schedule-arrow:hover { background: rgba(120, 120, 128, 0.2); }
+  .schedule-arrow:active { transform: scale(0.92); }
+  .schedule-week-btn { flex: 1; background: var(--gray-bg); border: none; border-radius: 16px; padding: 10px 16px; cursor: pointer; font-family: inherit; color: var(--text); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: background 0.15s ease; text-align: center; }
+  .schedule-week-btn:hover { background: rgba(120, 120, 128, 0.2); }
+  .schedule-week-btn:active { transform: scale(0.98); }
+  .schedule-week-btn-dates { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .schedule-week-btn-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .schedule-week-chevron { font-size: 12px; color: var(--text-tertiary); margin-left: 4px; }
+
+  .weeks-list { max-height: 60vh; overflow-y: auto; padding: 4px 0; }
+  .week-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 12px; cursor: pointer; transition: background 0.15s ease; margin: 2px 8px; gap: 10px; }
+  .week-item:hover { background: rgba(120, 120, 128, 0.12); }
+  .week-item.current { background: rgba(0, 122, 255, 0.1); }
+  .week-item-dates { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+  .week-item-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .week-item-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .week-item-badge.num1 { background: rgba(52, 199, 89, 0.15); color: var(--green); }
+  .week-item-badge.num2 { background: rgba(88, 86, 214, 0.15); color: var(--indigo); }
+  .week-item-current { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  .schedule-location { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .schedule-building { font-size: 11px; color: var(--text-secondary); font-weight: 600; padding: 2px 8px; background: var(--gray-bg); border-radius: 100px; }
+
+  .schedule-row { display: flex; gap: 16px; padding: 14px 20px; border-top: 1px solid var(--separator); align-items: flex-start; }
+  .schedule-row:first-of-type { border-top: none; }
+  .schedule-time { flex-shrink: 0; width: 68px; display: flex; flex-direction: column; align-items: flex-start; }
+  .schedule-time-main { font-size: 16px; font-weight: 700; }
+  .schedule-time-sub { font-size: 12px; color: var(--text-secondary); }
+  .schedule-info { flex: 1; min-width: 0; }
+  .schedule-subject { font-size: 15px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+  .schedule-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
+  .schedule-room { font-size: 12px; color: var(--accent); font-weight: 600; display: inline-block; padding: 2px 8px; background: rgba(0, 122, 255, 0.1); border-radius: 100px; }
+
+  .absence-card { padding: 14px 20px; border-top: 1px solid var(--separator); }
+  .absence-card:first-of-type { border-top: none; }
+  .absence-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+  .absence-date-block { display: flex; flex-direction: column; }
+  .absence-date { font-size: 15px; font-weight: 600; }
+  .absence-weekday { font-size: 12px; color: var(--text-secondary); text-transform: capitalize; }
+  .absence-status { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 100px; background: rgba(120, 120, 128, 0.1); flex-shrink: 0; }
+  .absence-lessons { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .absence-lesson { display: flex; gap: 12px; padding: 10px 12px; background: var(--gray-bg); border-radius: 12px; align-items: flex-start; }
+  .absence-lesson-time { flex-shrink: 0; width: 52px; display: flex; flex-direction: column; }
+  .absence-lesson-time-main { font-size: 14px; font-weight: 700; }
+  .absence-lesson-time-sub { font-size: 11px; color: var(--text-secondary); }
+  .absence-lesson-info { flex: 1; min-width: 0; }
+  .absence-lesson-subject { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .absence-lesson-meta { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; }
+  .absence-lesson-room { display: inline-block; font-size: 11px; color: var(--accent); font-weight: 600; padding: 1px 7px; background: rgba(0, 122, 255, 0.1); border-radius: 100px; }
+  .absence-no-lessons { font-size: 12px; color: var(--text-tertiary); font-style: italic; padding: 6px 0; }
+
+  .grade-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 1px solid var(--separator); }
+  .grade-row:first-of-type { border-top: none; }
+  .grade-subject { font-size: 14px; font-weight: 500; flex: 1; padding-right: 12px; }
+  .grade-value { font-size: 20px; font-weight: 700; }
+
+  .filter-row { display: flex; gap: 8px; padding: 14px 20px; border-bottom: 1px solid var(--separator); flex-wrap: wrap; background: rgba(120, 120, 128, 0.06); }
+  .filter-row select, .filter-row input { padding: 10px 14px; border: 1px solid var(--glass-border-light); background: var(--glass-bg-light); border-radius: 12px; font-size: 13px; font-family: inherit; color: var(--text); min-width: 120px; flex: 1; }
+  .faculty-header { padding: 18px 22px 8px; font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+  .faculty-subheader { padding: 8px 22px 4px; font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; }
+
+  .tab-bar {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--glass-bg-light);
+    backdrop-filter: blur(40px) saturate(2);
+    -webkit-backdrop-filter: blur(40px) saturate(2);
+    border: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-highlight), var(--shadow-float);
+    border-radius: 100px; padding: 8px;
+    display: flex; gap: 4px; z-index: 200;
+    max-width: calc(100vw - 32px); overflow-x: auto;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-bar button { background: transparent; border: none; padding: 8px 14px; border-radius: 100px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-secondary); font-family: inherit; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tab-bar button .icon-svg { width: 24px; height: 24px; stroke-width: 1.6; }
+  .tab-bar button.active { background: var(--accent); color: #fff; }
+  .tab-bar button.active .icon-svg { stroke-width: 2.2; }
+
+  .empty { text-align: center; padding: 52px 20px; color: var(--text-tertiary); font-size: 14px; }
+  .toast {
+    position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    color: #fff; padding: 13px 24px; border-radius: 100px;
+    font-size: 14px; font-weight: 500;
+    animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000;
+  }
+  .toast.error { background: rgba(255, 59, 48, 0.95); }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 20px) scale(0.88); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+  .icon-svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+
+  .skeleton { background: var(--glass-bg-light); border: 1px solid var(--glass-border-light); border-radius: var(--radius-card); margin-bottom: 20px; padding: 20px; overflow: hidden; }
+  .skeleton-line { height: 16px; background: linear-gradient(90deg, rgba(120, 120, 128, 0.12) 0%, rgba(120, 120, 128, 0.24) 50%, rgba(120, 120, 128, 0.12) 100%); background-size: 200% 100%; border-radius: 8px; margin-bottom: 10px; animation: shimmer 1.6s ease-in-out infinite; }
+  .skeleton-line.short { width: 40%; }
+  .skeleton-line.mid { width: 65%; }
+  .skeleton-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(90deg, rgba(120, 120, 128, 0.12) 0%, rgba(120, 120, 128, 0.24) 50%, rgba(120, 120, 128, 0.12) 100%); background-size: 200% 100%; animation: shimmer 1.6s ease-in-out infinite; flex-shrink: 0; }
+  .skeleton-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .skeleton-row > div:last-child { flex: 1; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  .gb-spec { padding: 14px 16px; margin: 8px 8px 0; background: linear-gradient(135deg, rgba(88, 86, 214, 0.15), rgba(0, 122, 255, 0.1)); border-radius: 14px; border: 1px solid rgba(88, 86, 214, 0.2); }
+  .gb-spec-code { font-size: 11px; font-weight: 700; color: var(--indigo); margin-bottom: 4px; }
+  .gb-spec-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.3; }
+  .gb-spec-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+  .gb-spec-lbl { color: var(--text-secondary); }
+  .gb-spec-val { font-weight: 600; }
+  .gb-meta { padding: 12px 16px; margin: 8px 8px 0; background: var(--gray-bg); border-radius: 14px; }
+  .gb-meta-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+  .gb-meta-lbl { color: var(--text-secondary); }
+  .gb-meta-val { font-weight: 600; }
+  .gb-semester { margin: 12px 8px 0; padding: 12px 4px; border-top: 1px solid var(--separator); }
+  .gb-semester-title { font-size: 14px; font-weight: 800; text-align: center; padding: 8px 0 12px; }
+  .gb-section-title { font-size: 11px; font-weight: 700; color: var(--indigo); text-transform: uppercase; padding: 10px 12px 6px; background: rgba(88, 86, 214, 0.08); border-radius: 8px 8px 0 0; }
+  .gb-row { display: flex; gap: 12px; padding: 12px; border-bottom: 1px solid var(--separator); align-items: center; }
+  .gb-row:last-child { border-bottom: none; }
+  .gb-row-left { flex: 1; min-width: 0; }
+  .gb-row-subject { font-size: 14px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+  .gb-row-meta { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
+  .gb-row-date { font-size: 11px; color: var(--text-tertiary); font-family: 'SF Mono', Monaco, monospace; }
+  .gb-grade { font-size: 13px; font-weight: 800; padding: 6px 12px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; text-transform: capitalize; }
+  .gb-grade.grade-5 { background: rgba(52, 199, 89, 0.15); color: var(--green); }
+  .gb-grade.grade-4 { background: rgba(0, 122, 255, 0.15); color: var(--accent); }
+  .gb-grade.grade-3 { background: rgba(255, 149, 0, 0.15); color: var(--orange); }
+  .gb-grade.grade-2 { background: rgba(255, 59, 48, 0.15); color: var(--red); }
+  .gb-grade.grade-pass { background: rgba(52, 199, 89, 0.15); color: var(--green); }
+  .gb-grade.grade-fail { background: rgba(255, 59, 48, 0.15); color: var(--red); }
+
+  .subject-course-picker { display: flex; gap: 8px; padding: 12px 20px; border-bottom: 1px solid var(--separator); flex-wrap: wrap; background: var(--gray-bg); }
+  .subject-course-btn { padding: 8px 16px; border-radius: 100px; background: var(--glass-bg-light); border: 1px solid var(--glass-border-light); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text); }
+  .subject-course-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .subject-row { display: flex; gap: 12px; padding: 14px 20px; border-top: 1px solid var(--separator); cursor: pointer; align-items: center; }
+  .subject-row:first-of-type { border-top: none; }
+  .subject-row:hover { background: rgba(120,120,128,0.06); }
+  .subject-name { flex: 1; font-weight: 600; font-size: 14px; }
+  .subject-teacher { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .subject-exam { padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+  .exam-exam { background: rgba(255,59,48,0.15); color: var(--red); }
+  .exam-credit { background: rgba(52,199,89,0.15); color: var(--green); }
+  .exam-diff { background: rgba(255,149,0,0.15); color: var(--orange); }
+
+  .link-category { padding: 14px 20px 6px; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+  .ext-link { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-top: 1px solid var(--separator); cursor: pointer; }
+  .ext-link:hover { background: rgba(120,120,128,0.06); }
+  .ext-link-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .ext-link-info { flex: 1; min-width: 0; }
+  .ext-link-info h4 { font-size: 14px; font-weight: 600; }
+  .ext-link-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .ext-link-chevron { color: var(--text-tertiary); font-size: 18px; }
+
+  .rating-row { display: flex; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--separator); align-items: center; }
+  .rating-row:first-of-type { border-top: none; }
+  .rating-place { width: 32px; height: 32px; border-radius: 50%; background: var(--gray-bg); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); flex-shrink: 0; }
+  .rating-place.top1 { background: linear-gradient(135deg,#ffd60a,#ff9f0a); color: #fff; }
+  .rating-place.top2 { background: linear-gradient(135deg,#e5e5ea,#a1a1aa); color: #fff; }
+  .rating-place.top3 { background: linear-gradient(135deg,#f4a261,#c97b4a); color: #fff; }
+  .rating-info { flex: 1; min-width: 0; }
+  .rating-name { font-weight: 600; font-size: 14px; }
+  .rating-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .rating-score { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; flex-shrink: 0; }
+
+  .campus-actions { display: flex; gap: 8px; padding: 8px 20px 16px; }
+  .campus-actions button { flex: 1; background: var(--accent); color: #fff; border: none; padding: 12px 16px; border-radius: 14px; font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .campus-actions button.alt { background: var(--gray-bg); color: var(--text); }
+
+  .search-top-bar { display: flex; gap: 8px; padding: 12px 20px; border-bottom: 1px solid var(--separator); }
+  .search-top-input { flex: 1; padding: 12px 16px; border-radius: 100px; background: var(--gray-bg); border: 1px solid transparent; font-family: inherit; font-size: 14px; color: var(--text); }
+  .search-top-input:focus { outline: none; border-color: var(--accent); background: var(--glass-bg-light); }
+
+  .dorm-row { padding: 16px 20px; border-top: 1px solid var(--separator); }
+  .dorm-row:first-of-type { border-top: none; }
+  .dorm-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .dorm-addr { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+  .dorm-info { font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; }
+  .dorm-actions { display: flex; gap: 8px; }
+  .dorm-actions a, .dorm-actions button { flex: 1; text-align: center; background: var(--gray-bg); color: var(--text); border: none; padding: 8px 12px; border-radius: 100px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; }
+
+  @media (max-width: 700px) {
+    .page-title { padding: 26px 22px 8px; }
+    .page-title h1 { font-size: 30px; }
+    body.scrolled .page-title h1 { font-size: 20px; }
+    main { padding: 0 12px; }
+    .header { margin: 12px 12px 0; padding: 9px 14px 9px 18px; }
+    .tab-bar { bottom: 14px; padding: 6px; }
+    .tab-bar button { padding: 7px 11px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div id='login-screen'>
+  <div class='login-card'>
+    <div class='logo'>🎓</div>
+    <h1>СКФУ</h1>
+    <p class='subtitle'>Войдите, чтобы продолжить</p>
+    <div id='login-error' class='error-msg hidden'></div>
+    <input id='login-input' type='text' placeholder='Логин' autocomplete='username'>
+    <input id='password-input' type='password' placeholder='Пароль' autocomplete='current-password'>
+    <button id='login-btn'>Войти</button>
+    <div class='login-hint'>
+      <code>dzhangurazov</code> / <code>1234</code> — староста<br>
+      <code>babickiy</code> / <code>1234</code> — студент<br>
+      <code>petrova</code> / <code>1234</code> — преподаватель
+    </div>
+  </div>
+</div>
+
+<div id='app-screen' class='hidden'>
+  <div class='header'>
+    <div class='brand'>
+      <div class='dot'>🎓</div>
+      <span class='text'>СКФУ</span>
+    </div>
+    <div class='user-info'>
+      <span class='group' id='me-group'></span>
+      <button id='logout-btn'>Выйти</button>
+    </div>
+  </div>
+
+  <div class='page-title'>
+    <h1 id='page-title-text'>Загрузка...</h1>
+    <p id='page-subtitle'></p>
+  </div>
+
+  <main id='main-content'></main>
+  <div class='tab-bar' id='tab-bar'></div>
+</div>
+
+<script>
+var API = '';
+var LANG = localStorage.getItem('lang') || 'ru';
+
+var TRANSLATIONS = {
+  ru: {
+    'home': 'Главная', 'schedule': 'Пары', 'journal': 'Журнал', 'stats': 'Статистика',
+    'settings': 'Настройки', 'official': 'Список', 'working': 'Журнал', 'services': 'Сервисы',
+    'starostas': 'Старосты', 'subjects': 'Предметы', 'rating': 'Рейтинг',
+    'exit': 'Выйти', 'login': 'Войти', 'username': 'Логин', 'password': 'Пароль',
+    'today': 'Сегодня', 'week': 'Неделя', 'no_lessons': 'Пар нет',
+    'attendance': 'Посещаемость', 'absent': 'Пропуск', 'excused': 'Уваж.', 'drone': 'БПЛА',
+    'schedule_today': 'Расписание на сегодня', 'search': 'Поиск',
+    'profile': 'Профиль', 'my_profile': 'Мой профиль',
+    'gradebook': 'Зачётная книжка', 'open_gradebook': 'Открыть зачётку',
+    'dormitories': 'Общежития', 'campus': 'Корпуса', 'links': 'Полезные ссылки',
+    'language': 'Язык', 'theme': 'Тема', 'about': 'О приложении'
+  },
+  en: {
+    'home': 'Home', 'schedule': 'Schedule', 'journal': 'Journal', 'stats': 'Stats',
+    'settings': 'Settings', 'official': 'List', 'working': 'Journal', 'services': 'Services',
+    'starostas': 'Monitors', 'subjects': 'Subjects', 'rating': 'Rating',
+    'exit': 'Logout', 'login': 'Login', 'username': 'Username', 'password': 'Password',
+    'today': 'Today', 'week': 'Week', 'no_lessons': 'No lessons',
+    'attendance': 'Attendance', 'absent': 'Absent', 'excused': 'Excused', 'drone': 'Drone alert',
+    'schedule_today': 'Schedule for today', 'search': 'Search',
+    'profile': 'Profile', 'my_profile': 'My profile',
+    'gradebook': 'Gradebook', 'open_gradebook': 'Open gradebook',
+    'dormitories': 'Dormitories', 'campus': 'Campus', 'links': 'Useful links',
+    'language': 'Language', 'theme': 'Theme', 'about': 'About'
+  },
+  de: {
+    'home': 'Startseite', 'schedule': 'Stundenplan', 'journal': 'Journal', 'stats': 'Statistik',
+    'settings': 'Einstellungen', 'official': 'Liste', 'working': 'Journal', 'services': 'Dienste',
+    'starostas': 'Gruppensprecher', 'subjects': 'Fächer', 'rating': 'Bewertung',
+    'exit': 'Abmelden', 'login': 'Anmelden', 'username': 'Benutzername', 'password': 'Passwort',
+    'today': 'Heute', 'week': 'Woche', 'no_lessons': 'Keine Kurse',
+    'attendance': 'Anwesenheit', 'absent': 'Abwesend', 'excused': 'Entschuldigt', 'drone': 'Drohnenalarm',
+    'schedule_today': 'Stundenplan für heute', 'search': 'Suche',
+    'profile': 'Profil', 'my_profile': 'Mein Profil',
+    'gradebook': 'Notenbuch', 'open_gradebook': 'Notenbuch öffnen',
+    'dormitories': 'Wohnheime', 'campus': 'Campus', 'links': 'Nützliche Links',
+    'language': 'Sprache', 'theme': 'Thema', 'about': 'Über die App'
+  }
+};
+
+function t(key) {
+  return (TRANSLATIONS[LANG] && TRANSLATIONS[LANG][key]) || (TRANSLATIONS.ru[key]) || key;
+}
+
+var JOURNAL_DAYS = 14;
+
+var state = {
+  token: localStorage.getItem('token') || null,
+  user: null,
+  currentTab: null,
+  journalStart: startOfWeek(new Date()),
+  filterFaculty: '',
+  filterCourse: '',
+  filterSearch: '',
+  scheduleOffset: 0,
+  viewingGroup: null,
+  viewingTeacher: null,
+  viewingTeacherName: null,
+  teacherScheduleOffset: 0,
+  subjectsCourse: '1'
+};
+
+var SOCIAL_META = {
+  phone: { label: 'Телефон', icon: '📱', color: '#34c759', defaultVisible: 'staff' },
+  email: { label: 'Email', icon: '📧', color: '#007aff', defaultVisible: 'all' },
+  telegram: { label: 'Telegram', icon: '✈️', color: '#0088cc', defaultVisible: 'staff' },
+  whatsapp: { label: 'WhatsApp', icon: '🟢', color: '#25d366', defaultVisible: 'staff' },
+  vk: { label: 'ВКонтакте', icon: '🟦', color: '#0077ff', defaultVisible: 'all' },
+  ok: { label: 'Одноклассники', icon: '🟠', color: '#ee8208', defaultVisible: 'all' },
+  rutube: { label: 'RuTube', icon: '📺', color: '#0f0f0f', defaultVisible: 'all' },
+  dzen: { label: 'Дзен', icon: '🧘', color: '#000000', defaultVisible: 'all' },
+  github: { label: 'GitHub', icon: '🐙', color: '#333333', defaultVisible: 'all' },
+  website: { label: 'Личный сайт', icon: '🌐', color: '#8e8e93', defaultVisible: 'all' },
+  custom: { label: 'Другое', icon: '✏️', color: '#5856d6', defaultVisible: 'all' }
+};
+
+var ICONS = {
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
+  journal: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.5 3-6 7-6s7 2.5 7 6"/><path d="M17 11a3 3 0 1 0 0-6"/><path d="M22 21c0-3-1.5-5-4-5.5"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  megaphone: '<path d="M3 11v3a1 1 0 0 0 1 1h2l4 4V6l-4 4H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/>',
+  chart: '<path d="M3 3v18h18"/><rect x="6" y="12" width="3" height="6" rx="1"/><rect x="11" y="8" width="3" height="10" rx="1"/><rect x="16" y="4" width="3" height="14" rx="1"/>'
+};
+
+function svgIcon(name, size) {
+  var path = ICONS[name] || ICONS.grid;
+  var cls = 'icon-svg' + (size ? ' ' + size : '');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="' + cls + '">' + path + '</svg>';
+}
+function iconNode(name, size) {
+  var span = document.createElement('span');
+  span.innerHTML = svgIcon(name, size);
+  return span.firstChild;
+}
+function startOfWeek(d) { var x = new Date(d); var day = x.getDay(); var diff = (day === 0 ? -6 : 1) - day; x.setDate(x.getDate() + diff); x.setHours(0,0,0,0); return x; }
+function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function fmtISO(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function fmtRangeLabel(start, end) {
+  var months = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  if (start.getMonth() === end.getMonth()) return start.getDate() + '–' + end.getDate() + ' ' + months[start.getMonth()] + ' ' + start.getFullYear();
+  return start.getDate() + ' ' + months[start.getMonth()] + ' – ' + end.getDate() + ' ' + months[end.getMonth()];
+}
+function weekdaysShort() { return ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']; }
+function isSameDay(a, b) { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function initials(name) { var p = String(name).trim().split(/\s+/); if (p.length>=2) return (p[0][0]+p[1][0]).toUpperCase(); return name.slice(0,2).toUpperCase(); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function(c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]; }); }
+function formatDate(iso) { if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('ru-RU',{ day:'2-digit', month:'2-digit', year:'numeric' }); }
+function formatDayName(day) { var m = { mon:'Пн', tue:'Вт', wed:'Ср', thu:'Чт', fri:'Пт', sat:'Сб', sun:'Вс' }; return m[day] || day; }
+function roleLabel(role) { return { student:'Студент', starosta:'Староста', teacher:'Преподаватель' }[role] || role; }
+
+function el(tag, attrs, children) {
+  attrs = attrs || {};
+  var node = document.createElement(tag);
+  for (var k in attrs) {
+    var v = attrs[k];
+    if (k === 'onclick') node.onclick = v;
+    else if (k === 'class') node.className = v;
+    else if (k === 'html') node.innerHTML = v;
+    else if (k === 'text') node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  if (children) {
+    if (!Array.isArray(children)) children = [children];
+    children.forEach(function(c) { if (c == null) return; node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+  }
+  return node;
+}
+function toast(text, isError) { var n = el('div', { class: 'toast' + (isError ? ' error' : ''), text: text }); document.body.appendChild(n); setTimeout(function(){ n.remove(); }, 2200); }
+function avatarNode(user, size) {
+  var cls = 'avatar' + (size ? ' ' + size : '');
+  var node = el('div', { class: cls });
+  if (user && user.photoUrl) node.appendChild(el('img', { src: user.photoUrl, alt: '' }));
+  else node.textContent = user ? initials(user.fullName || '') : '?';
+  return node;
+}
+function openOverlay() {
+  var overlay = el('div', { class: 'popover-overlay' });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  var pop = el('div', { class: 'popover' });
+  overlay.appendChild(pop);
+  document.body.appendChild(overlay);
+  return overlay;
+}
+async function api(path, options) {
+  options = options || {};
+  var headers = {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache'
+  };
+  if (options.headers) { for (var k in options.headers) headers[k] = options.headers[k]; }
+  if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+  var res = await fetch(API + path, { method: options.method || 'GET', headers: headers, body: options.body });
+  if (res.headers.get('content-type')?.includes('text/csv')) return res.blob();
+  var text = await res.text();
+  var data = null;
+  try { data = text ? JSON.parse(text) : null; } catch(e) { data = text; }
+  if (!res.ok) throw new Error((data && data.error) || ('Ошибка ' + res.status));
+  if (data === null && res.status === 304) {
+    // Кэш отдал пустой ответ — делаем повторный запрос без кэша
+    return api(path, Object.assign({}, options, { headers: Object.assign({}, headers, { 'Cache-Control': 'no-cache' }) }));
+  }
+  return data;
+}
+
+async function tryLogin(login, password) {
+  var btn = document.getElementById('login-btn');
+  var err = document.getElementById('login-error');
+  err.classList.add('hidden');
+  btn.disabled = true; btn.textContent = 'Входим...';
+  try {
+    var data = await api('/api/login', { method: 'POST', body: JSON.stringify({ login, password }) });
+    state.token = data.token; state.user = data.user;
+    localStorage.setItem('token', data.token);
+    await enterApp();
+  } catch (e) { err.textContent = e.message; err.classList.remove('hidden'); }
+  finally { btn.disabled = false; btn.textContent = 'Войти'; }
+}
+async function checkAuth() {
+  if (!state.token) return false;
+  try { state.user = await api('/api/me'); return true; }
+  catch (e) { state.token = null; localStorage.removeItem('token'); return false; }
+}
+function logout() { state.token = null; state.user = null; localStorage.removeItem('token'); document.getElementById('app-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
+
+var TABS_STUDENT = [
+  { key: 'home', label: t('home'), title: t('home'), subtitle: 'Ваша сводка', accent: 'var(--tab-accent-home)', icon: 'home' },
+  { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Чередование недель', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+  { key: 'journal', label: t('journal'), title: 'Журнал группы', subtitle: 'Просмотр', accent: 'var(--tab-accent-journal)', icon: 'journal' },
+  { key: 'stats', label: t('stats'), title: 'Моя статистика', subtitle: 'Пропуски и оценки', accent: 'var(--tab-accent-home)', icon: 'chart' },
+  { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
+  { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+];
+
+var TABS_STAROSTA = [
+  { key: 'official', label: t('official'), title: 'Официальный список', subtitle: 'Студенты группы', accent: 'var(--tab-accent-home)', icon: 'list' },
+  { key: 'working', label: t('working'), title: 'Журнал посещаемости', subtitle: 'Нажмите на ячейку', accent: 'var(--tab-accent-journal)', icon: 'journal' },
+  { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Чередование недель', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+  { key: 'stats', label: t('stats'), title: 'Статистика группы', subtitle: 'Посещаемость', accent: 'var(--tab-accent-starostas)', icon: 'chart' },
+  { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
+  { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+];
+
+var TABS_TEACHER = [
+  { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
+  { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+  { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
+  { key: 'inbox', label: 'Входящие', title: 'Входящие', subtitle: 'Сообщения и объявления', accent: 'var(--tab-accent-events)', icon: 'megaphone' },
+  { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+];
+
+var TABS_CURATOR = [
+  // Сначала — вкладки преподавателя
+  { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
+  { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+  // Потом — вкладки куратора
+  { key: 'curator-journals', label: 'Журналы', title: 'Журналы', subtitle: 'Все группы и предметы', accent: 'var(--tab-accent-events)', icon: 'journal' },
+  { key: 'curator-students', label: 'Студенты', title: 'Студенты', subtitle: 'Сводка по успеваемости', accent: 'var(--tab-accent-starostas)', icon: 'people' },
+  // Общие сервисы
+  { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
+  { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+];
+
+function getTabs() {
+  if (state.user.role === 'curator') return TABS_CURATOR;
+  if (state.user.role === 'teacher') return TABS_TEACHER;
+  if (state.user.role === 'starosta') return TABS_STAROSTA;
+  return TABS_STUDENT;
+}
+
+function buildTabBar() {
+  var bar = document.getElementById('tab-bar');
+  bar.innerHTML = '';
+  getTabs().forEach(function(t) {
+    var btn = el('button', { 'data-tab': t.key, onclick: function() { switchTab(t.key); } });
+    btn.appendChild(iconNode(t.icon));
+    btn.appendChild(el('span', { text: t.label }));
+    bar.appendChild(btn);
+  });
+}
+
+function switchTab(key) {
+  state.currentTab = key;
+  document.querySelectorAll('#tab-bar button').forEach(function(b) { b.classList.toggle('active', b.dataset.tab === key); });
+  var tabs = getTabs();
+  var t = tabs.find(function(x) { return x.key === key; });
+  if (!t) {
+  var virtualTitles = {
+    'teacher-schedule': { title: 'Расписание преподавателя', accent: 'var(--tab-accent-events)' },
+    'search': { title: 'Поиск расписания', accent: 'var(--tab-accent-services)' },
+    'subjects': { title: 'Предметы', accent: 'var(--tab-accent-services)' },
+    'rating': { title: 'Рейтинг группы', accent: 'var(--tab-accent-starostas)' },
+    'starostas': { title: 'Каталог старост', accent: 'var(--tab-accent-starostas)' },
+    'announcements': { title: 'Объявления', accent: 'var(--tab-accent-events)' },
+    'materials': { title: 'Материалы', accent: 'var(--tab-accent-home)' },
+    'office': { title: 'Приём', accent: 'var(--tab-accent-journal)' },
+    'profile': { title: 'Профиль', accent: 'var(--tab-accent-starostas)' },
+    'curator-journals': { title: 'Журналы', accent: 'var(--tab-accent-events)' },
+    'curator-students': { title: 'Студенты', accent: 'var(--tab-accent-starostas)' },
+    'curator-student-detail': { title: 'Сводка по студенту', accent: 'var(--tab-accent-starostas)' },
+  };
+  if (virtualTitles[key]) {
+    t = { title: virtualTitles[key].title, subtitle: '', accent: virtualTitles[key].accent };
+  } else {
+    t = { title: '', subtitle: '', accent: 'var(--accent)' };
+  }
+  }
+  document.getElementById('page-title-text').textContent = t.title;
+  document.getElementById('page-subtitle').textContent = t.subtitle;
+  document.documentElement.style.setProperty('--tab-accent', t.accent);
+  renderCurrentTab();
+}
+
+var main = document.getElementById('main-content');
+function renderSkeleton() {
+  return '<div class="skeleton"><div class="skeleton-line short"></div><div class="skeleton-row"><div class="skeleton-avatar"></div><div><div class="skeleton-line mid"></div><div class="skeleton-line short"></div></div></div></div>';
+}
+async function renderCurrentTab() {
+  main.innerHTML = renderSkeleton();
+  try {
+    switch (state.currentTab) {
+      case 'home':
+        if (state.user.role === 'student' || state.user.role === 'starosta') await renderHome();
+        else await renderHomeForTeacher(); // teacher И curator
+        break;
+      case 'schedule':
+        if (state.user.role === 'teacher' || state.user.role === 'curator') await renderTeacherScheduleForSelf();
+        else await renderSchedule();
+        break;
+      case 'teacher-schedule': await renderTeacherSchedule(); break;
+      case 'journal': await renderJournalReadOnly(); break;
+      case 'stats': await renderStats(); break;
+      case 'search': await renderSearchSchedule(); break;
+      case 'subjects': await renderSubjects(); break;
+      case 'rating': await renderRating(); break;
+      case 'official': await renderOfficial(); break;
+      case 'working': await renderWorking(); break;
+      case 'starostas': await renderStarostasCatalog(); break;
+      case 'services': await renderServices(); break;
+      case 'announcements': await renderAnnouncements(); break;
+      case 'materials': await renderMaterials(); break;
+      case 'office': await renderOfficeHours(); break;
+      case 'profile': await renderProfileSelf(); break;
+      case 'settings': await renderSettings(); break;
+      case 'curator-journals': await renderCuratorJournals(); break;
+      case 'curator-students': await renderCuratorStudents(); break;
+      case 'curator-student-detail': await renderCuratorStudentDetail(); break;
+      default: main.innerHTML = '<div class="empty">Раздел в разработке</div>';
+    }
+  } catch (e) { main.innerHTML = '<div class="group"><div class="empty">' + escapeHtml(e.message) + '</div></div>'; }
+}
+
+async function renderTeacherScheduleForSelf() {
+  state.viewingTeacher = state.user.id;
+  state.viewingTeacherName = state.user.fullName;
+  state.teacherScheduleOffset = state.teacherScheduleOffset || 0;
+  await renderTeacherSchedule();
+}
+
+// ============================================================
+//  ЖУРНАЛ ПРЕПОДАВАТЕЛЯ
+// ============================================================
+async function openTeacherJournal(groupCode, subject) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.style.minWidth = '90vw';
+  pop.style.maxWidth = '900px';
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+
+  try {
+    var data = await api('/api/teacher/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject));
+
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [
+      el('h3', { text: subject }),
+      el('p', { text: 'Группа ' + groupCode + ' · ' + data.students.length + ' студентов' })
+    ]));
+
+
+    // Таблица
+    if (!data.dates.length) {
+      pop.appendChild(el('div', { class: 'empty', text: 'Нет дат для отображения' }));
+      return;
+    }
+
+    var wrapper = el('div', { class: 'journal-wrapper' });
+    var table = buildTeacherJournalTable(data, groupCode, subject, overlay);
+    wrapper.appendChild(table);
+    pop.appendChild(wrapper);
+
+  } catch (e) {
+    pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+function buildTeacherJournalTable(data, groupCode, subject, overlay) {
+  var theadRow = el('tr', {});
+  theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
+  data.dates.forEach(function(d) {
+    theadRow.appendChild(el('th', { class: 'date-cell' }, [
+      el('div', { class: 'weekday', text: d.slice(8, 10) + '.' + d.slice(5, 7) })
+    ]));
+  });
+
+  var tbody = el('tbody', {});
+  data.students.forEach(function(s) {
+    var tr = el('tr', {});
+    var nameCell = el('td', { class: 'name-col' });
+
+    // Цвет в зависимости от количества Н
+    var colorMap = {
+      none: 'var(--text)',
+      yellow: '#ffcc00',
+      orange: 'var(--orange)',
+      red: 'var(--red)'
+    };
+    var nameColor = colorMap[s.colorLevel] || 'var(--text)';
+
+    if (s.individualPlan) {
+      nameCell.appendChild(el('span', { style: 'color: var(--accent); font-weight:700; margin-right: 6px;', text: '★' }));
+    }
+    nameCell.appendChild(el('span', { style: 'color: ' + nameColor + '; font-weight: 600;', text: s.fullName }));
+    if (s.fromGroup) {
+      nameCell.appendChild(el('span', { style: 'color: var(--text-secondary); font-size: 11px; margin-left: 6px;', text: '(' + s.fromGroup + ')' }));
+    }
+    if (s.nCount > 0) {
+      nameCell.appendChild(el('span', {
+        style: 'font-size: 11px; margin-left: 6px; padding: 1px 6px; border-radius: 100px; background: ' + nameColor + '20; color: ' + nameColor + '; font-weight: 700;',
+        text: s.nCount + 'Н'
+      }));
+    }
+    if (s.fromGroup) {
+      nameCell.appendChild(el('span', { style: 'color: var(--text-secondary); font-size: 11px; margin-left: 6px;', text: '(' + s.fromGroup + ')' }));
+    }
+    tr.appendChild(nameCell);
+
+    data.dates.forEach(function(d) {
+      var mark = (data.marks[s.id] || {})[d] || '';
+      var td = el('td', { class: 'att-cell' });
+      if (mark) {
+        var cls = mark === 'Н' ? 'absent' : (mark === 'С' ? 'drone' : 'grade-' + mark);
+        td.appendChild(el('span', { class: 'status-badge ' + cls, text: mark }));
+      }
+      td.addEventListener('click', function() {
+        openMarkPicker(s.id, d, mark, groupCode, subject, overlay);
+      });
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  return el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]);
+}
+
+function openMarkPicker(studentId, date, currentMark, groupCode, subject, parentOverlay) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '';
+  pop.appendChild(el('div', { class: 'popover-header' }, [
+    el('h3', { text: 'Отметка' }),
+    el('p', { text: 'Дата: ' + date })
+  ]));
+
+  var options = [
+    { key: 'Н', label: 'Не был', color: 'var(--red)' },
+    { key: 'С', label: 'БПЛА', color: 'var(--orange)' },
+    { key: '2', label: 'Оценка 2', color: 'var(--red)' },
+    { key: '3', label: 'Оценка 3', color: 'var(--orange)' },
+    { key: '4', label: 'Оценка 4', color: 'var(--accent)' },
+    { key: '5', label: 'Оценка 5', color: 'var(--green)' }
+  ];
+
+  options.forEach(function(opt) {
+    var item = el('div', { class: 'popover-item' }, [
+      el('div', { class: 'icon', style: 'background: ' + opt.color + ';', text: opt.key }),
+      el('div', { class: 'label', text: opt.label }),
+      currentMark === opt.key ? el('div', { class: 'check', text: '✓' }) : null
+    ]);
+    item.addEventListener('click', async function() {
+      try {
+        await api('/api/teacher/journal/mark', {
+          method: 'POST',
+          body: JSON.stringify({ group: groupCode, subject: subject, studentId: studentId, date: date, mark: opt.key })
+        });
+        overlay.remove();
+        parentOverlay.remove();
+        openTeacherJournal(groupCode, subject);
+      } catch (e) { toast(e.message, true); }
+    });
+    pop.appendChild(item);
+  });
+
+  if (currentMark) {
+    var clear = el('div', { class: 'popover-item clear' }, [
+      el('div', { class: 'icon', text: '×' }),
+      el('div', { class: 'label', text: 'Убрать отметку' })
+    ]);
+    clear.addEventListener('click', async function() {
+      try {
+        await api('/api/teacher/journal/mark', {
+          method: 'POST',
+          body: JSON.stringify({ group: groupCode, subject: subject, studentId: studentId, date: date, mark: null })
+        });
+        overlay.remove();
+        parentOverlay.remove();
+        openTeacherJournal(groupCode, subject);
+      } catch (e) { toast(e.message, true); }
+    });
+    pop.appendChild(clear);
+  }
+}
+
+async function renderHomeForTeacher() {
+  main.innerHTML = '';
+  var me = state.user;
+
+  // Hero для препода
+  var hero = el('div', { class: 'hero-card' }, [
+    el('div', { class: 'lbl', text: 'Преподаватель' }),
+    el('div', { class: 'big', text: me.fullName.split(' ')[0] }),
+    el('div', { class: 'sub', text: me.bio || 'Добро пожаловать!' })
+  ]);
+  main.appendChild(hero);
+
+  // Расписание на сегодня
+  try {
+    var today = new Date();
+    var offset = 0;
+    var data = await api('/api/teachers/' + me.id + '/schedule?offset=' + offset);
+
+    var dowNames = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+    var dow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][today.getDay()];
+
+    var dayData = (data.days || []).find(function(d) { return d.day === dow; });
+    var lessons = dayData ? dayData.lessons : [];
+
+    var dayGroup = el('div', { class: 'group' });
+
+    if (today.getDay() === 0) {
+      dayGroup.appendChild(el('div', { class: 'empty', text: 'Выходной — отдыхай! 🎉' }));
+    } else if (!lessons.length) {
+      dayGroup.appendChild(el('div', { class: 'empty', text: 'Сегодня пар нет' }));
+    } else {
+      lessons.forEach(function(l) {
+        var parts = l.time.split('–');
+        var roomText = l.room || '';
+        var buildingText = '';
+        var m = String(l.room || '').match(/^(\d+)[-–—](.+)$/);
+        if (m) { buildingText = 'Корпус ' + m[1]; roomText = 'ауд. ' + m[2]; }
+
+        // Создаём строку пары
+        var lessonRow = el('div', { class: 'schedule-row' }, [
+          el('div', { class: 'schedule-time' }, [
+            el('div', { class: 'schedule-time-main', text: parts[0] }),
+            el('div', { class: 'schedule-time-sub', text: parts[1] || '' })
+          ]),
+          el('div', { class: 'schedule-info' }, [
+            el('div', { class: 'schedule-subject', text: l.subject }),
+            el('div', { class: 'schedule-meta' }, [
+              el('span', { text: l.type }),
+              l.group ? el('span', { text: ' · ' }) : null,
+              l.group ? el('span', { text: l.group }) : null
+            ]),
+            el('div', { class: 'schedule-location' }, [
+              el('span', { class: 'schedule-room', text: roomText }),
+              buildingText ? el('span', { class: 'schedule-building', text: buildingText }) : null
+            ])
+          ])
+        ]);
+
+        // Если есть группа — при клике открываем журнал
+        if (l.group) {
+          lessonRow.style.cursor = 'pointer';
+          lessonRow.addEventListener('click', function() {
+            openTeacherJournal(l.group, l.subject);
+          });
+        }
+
+        dayGroup.appendChild(lessonRow);
+              });
+    }
+    main.appendChild(dayGroup);
+  } catch (e) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'Не удалось загрузить расписание' })
+    ]));
+  }
+}
+
+async function renderHome() {
+  main.innerHTML = '';
+  var me = state.user;
+  var stats = await api('/api/me/stats');
+  var hero = el('div', { class: 'hero-card' }, [
+    el('div', { class: 'lbl', text: 'Моя посещаемость' }),
+    el('div', { class: 'big', html: stats.percent + '<span>%</span>' }),
+    el('div', { class: 'sub', text: 'Всего пар: ' + stats.total }),
+    el('div', { class: 'row-stats' }, [
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(stats.absent) }), el('div', { class: 'lbl2', text: 'пропуск' })]),
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(stats.excused) }), el('div', { class: 'lbl2', text: 'уваж.' })]),
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(stats.drone) }), el('div', { class: 'lbl2', text: 'БПЛА' })])
+    ])
+  ]);
+  main.appendChild(hero);
+  try {
+    var today = await api('/api/groups/' + encodeURIComponent(me.group) + '/schedule/today');
+    var dayGroup = el('div', { class: 'group' });
+    dayGroup.appendChild(el('div', { class: 'group-header' }, ['Сегодня · ' + today.dayName, el('span', { class: 'badge ' + (today.weekNumber === 1 ? 'badge-editable' : 'badge-readonly'), text: today.weekNumber === 1 ? 'Числитель' : 'Знаменатель' })]));
+    if (today.isWeekend) {
+      dayGroup.appendChild(el('div', { class: 'empty', text: 'Выходной — отдыхай! 🎉' }));
+    } else if (!today.lessons.length) {
+      dayGroup.appendChild(el('div', { class: 'empty', text: 'Сегодня пар нет' }));
+    } else {
+      today.lessons.forEach(function(l) {
+        var parts = l.time.split('–');
+        dayGroup.appendChild(el('div', { class: 'schedule-row' }, [
+          el('div', { class: 'schedule-time' }, [el('div', { class: 'schedule-time-main', text: parts[0] }), el('div', { class: 'schedule-time-sub', text: parts[1] || '' })]),
+          el('div', { class: 'schedule-info' }, [
+            el('div', { class: 'schedule-subject', text: l.subject }),
+            el('div', { class: 'schedule-meta', text: l.type + ' · ' + l.teacher }),
+            el('div', { class: 'schedule-room', text: l.room })
+          ])
+        ]));
+      });
+    }
+    main.appendChild(dayGroup);
+  } catch (e) {}
+}
+
+async function renderSchedule() {
+  main.innerHTML = '';
+  var offset = state.scheduleOffset || 0;
+  var groupCode = state.viewingGroup || state.user.group;
+  var isOwnGroup = groupCode === state.user.group;
+
+  var data;
+  try {
+    data = await api('/api/groups/' + encodeURIComponent(groupCode) + '/schedule?offset=' + offset);
+  } catch (err) {
+    // Расписания нет — показываем сообщение + кнопку назад
+    var errGroup = el('div', { class: 'group' });
+    errGroup.appendChild(el('div', { class: 'group-header' }, [groupCode]));
+    errGroup.appendChild(el('div', { class: 'empty', text: 'Расписание для этой группы пока не добавлено' }));
+    if (!isOwnGroup) {
+      errGroup.appendChild(el('div', { style: 'padding: 0 20px 16px;' }, [
+        el('button', { class: 'btn btn-secondary', style: 'width: 100%;', text: '← Вернуться к своей группе', onclick: function() {
+          state.viewingGroup = null;
+          state.scheduleOffset = 0;
+          renderSchedule();
+        }})
+      ]));
+    }
+    main.appendChild(errGroup);
+    return;
+  }
+  var weekdays = { mon: 'Понедельник', tue: 'Вторник', wed: 'Среда', thu: 'Четверг', fri: 'Пятница', sat: 'Суббота' };
+  var months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  var startD = new Date(data.weekStartDate + 'T00:00:00');
+  var endD = new Date(data.weekEndDate + 'T00:00:00');
+  var weekLabel = startD.getMonth() === endD.getMonth()
+    ? startD.getDate() + ' – ' + endD.getDate() + ' ' + months[startD.getMonth()] + ' ' + startD.getFullYear()
+    : startD.getDate() + ' ' + months[startD.getMonth()] + ' – ' + endD.getDate() + ' ' + months[endD.getMonth()] + ' ' + endD.getFullYear();
+
+  var topGroup = el('div', { class: 'group' });
+  topGroup.appendChild(el('div', { class: 'schedule-top-bar' }, [
+    el('div', { class: 'schedule-top-info' }, [
+      el('div', { class: 'schedule-group-code', text: groupCode }),
+      isOwnGroup
+        ? el('div', { class: 'schedule-group-label', text: 'моя группа' })
+        : el('button', { class: 'schedule-group-back', text: '← вернуться к своей', onclick: function() {
+            state.viewingGroup = null; state.scheduleOffset = 0; renderSchedule();
+          }})
+    ]),
+    el('button', {
+      class: 'schedule-search-btn',
+      html: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+      onclick: openGroupPicker
+    })
+  ]));
+  main.appendChild(topGroup);
+
+  var headGroup = el('div', { class: 'group' });
+  var navRow = el('div', { class: 'schedule-week-header' });
+  navRow.appendChild(el('button', { class: 'schedule-arrow', text: '‹', onclick: function() {
+    state.scheduleOffset = (state.scheduleOffset || 0) - 1; renderSchedule();
+  }}));
+  var weekBtn = el('button', { class: 'schedule-week-btn' }, [
+    el('div', { class: 'schedule-week-btn-dates', text: weekLabel }),
+    el('div', { class: 'schedule-week-btn-meta' }, [
+      el('span', { class: 'badge ' + (data.weekNumber === 1 ? 'badge-editable' : 'badge-readonly'), text: data.weekNumber === 1 ? 'Числитель' : 'Знаменатель' }),
+      offset === 0 ? el('span', { class: 'schedule-current-marker', text: '• текущая' }) : null,
+      el('span', { class: 'schedule-week-chevron', text: '▾' })
+    ])
+  ]);
+  weekBtn.addEventListener('click', function() { openWeeksPickerForGroup(groupCode); });
+  navRow.appendChild(weekBtn);
+  navRow.appendChild(el('button', { class: 'schedule-arrow', text: '›', onclick: function() {
+    state.scheduleOffset = (state.scheduleOffset || 0) + 1; renderSchedule();
+  }}));
+  headGroup.appendChild(navRow);
+  main.appendChild(headGroup);
+
+  var todayDow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][new Date().getDay()];
+  var hasAny = false;
+
+  ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].forEach(function(dayKey) {
+    var day = data.days.find(function(d) { return d.day === dayKey; });
+    if (!day || !day.lessons || !day.lessons.length) return;
+    hasAny = true;
+    var dowIndex = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf(dayKey);
+    var dayDate = new Date(startD);
+    dayDate.setDate(dayDate.getDate() + dowIndex);
+    var isToday = offset === 0 && dayKey === todayDow;
+    var dayGroup = el('div', { class: 'group' });
+    dayGroup.appendChild(el('div', { class: 'group-header' }, [
+      weekdays[dayKey] + ' · ' + dayDate.getDate() + ' ' + months[dayDate.getMonth()],
+      isToday ? el('span', { class: 'badge badge-editable', text: 'Сегодня' }) : null
+    ]));
+    day.lessons.forEach(function(l) {
+      var parts = l.time.split('–');
+      var roomText = l.room || '';
+      var buildingText = '';
+      var m = String(l.room || '').match(/^(\d+)[-–—](.+)$/);
+      if (m) { buildingText = 'Корпус ' + m[1]; roomText = 'ауд. ' + m[2]; }
+      var teacherNode = null;
+      if (l.teacher) {
+        teacherNode = el('button', { class: 'schedule-teacher-btn', text: l.teacher, onclick: (function(teacherName) {
+          return function() { openTeacherScheduleByName(teacherName); };
+        })(l.teacher) });
+      }
+      dayGroup.appendChild(el('div', { class: 'schedule-row' }, [
+        el('div', { class: 'schedule-time' }, [el('div', { class: 'schedule-time-main', text: parts[0] }), el('div', { class: 'schedule-time-sub', text: parts[1] || '' })]),
+        el('div', { class: 'schedule-info' }, [
+          el('div', { class: 'schedule-subject', text: l.subject }),
+          el('div', { class: 'schedule-meta' }, [el('span', { text: l.type }), teacherNode ? el('span', { text: ' · ' }) : null, teacherNode]),
+          el('div', { class: 'schedule-location' }, [
+            el('span', { class: 'schedule-room', text: roomText }),
+            buildingText ? el('span', { class: 'schedule-building', text: buildingText }) : null
+          ])
+        ])
+      ]));
+    });
+    main.appendChild(dayGroup);
+  });
+  if (!hasAny) main.appendChild(el('div', { class: 'group' }, [el('div', { class: 'empty', text: 'На этой неделе пар нет' })]));
+}
+
+async function openWeeksPickerForGroup(groupCode) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var data = await api('/api/groups/' + encodeURIComponent(groupCode) + '/schedule/weeks');
+    renderWeeksList(data, overlay);
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+
+function renderWeeksList(data, overlay) {
+  var pop = overlay.querySelector('.popover');
+  var months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  pop.innerHTML = '';
+  pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Выбор недели' }), el('p', { text: 'Всего ' + data.weeks.length + ' недель' })]));
+  var list = el('div', { class: 'weeks-list' });
+  data.weeks.forEach(function(w) {
+    var startD = new Date(w.weekStart + 'T00:00:00');
+    var endD = new Date(w.weekEnd + 'T00:00:00');
+    var label = startD.getDate() + ' ' + months[startD.getMonth()] + ' – ' + endD.getDate() + ' ' + months[endD.getMonth()];
+    var item = el('div', { class: 'week-item' + (w.isCurrent ? ' current' : '') }, [
+      el('div', { class: 'week-item-dates', text: label }),
+      el('div', { class: 'week-item-meta' }, [
+        w.weekNumber ? el('span', { class: 'week-item-badge ' + (w.weekNumber === 1 ? 'num1' : 'num2'), text: w.weekNumber === 1 ? 'Числ.' : 'Знам.' }) : null,
+        w.isCurrent ? el('span', { class: 'week-item-current', text: 'текущая' }) : null
+      ])
+    ]);
+    item.addEventListener('click', function() {
+      state.scheduleOffset = w.offset;
+      overlay.remove();
+      if (state.viewingTeacher) renderTeacherSchedule();
+      else renderSchedule();
+    });
+    list.appendChild(item);
+  });
+  pop.appendChild(list);
+}
+
+async function openTeacherScheduleByName(teacherName) {
+  var allTeachers = await api('/api/teachers');
+  var parts = teacherName.split(' ');
+  var found = allTeachers.find(function(t) {
+    var tParts = t.fullName.split(' ');
+    if (tParts[0] !== parts[0]) return false;
+    if (parts[1] && tParts[1] && tParts[1][0] !== parts[1][0]) return false;
+    return true;
+  });
+  if (!found) { toast('Преподаватель не найден в базе', true); return; }
+  state.viewingTeacher = found.id;
+  state.viewingTeacherName = found.fullName;
+  state.teacherScheduleOffset = 0;
+  switchTab('teacher-schedule');
+}
+
+async function openGroupPicker() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var groups = await api('/api/all-groups');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Выбор группы' }), el('p', { text: 'Всего ' + groups.length + ' групп' })]));
+    var searchInput = el('input', { type: 'text', placeholder: 'Поиск по коду или названию', class: 'group-search-input' });
+    pop.appendChild(searchInput);
+    var list = el('div', { class: 'groups-list' });
+    pop.appendChild(list);
+    function renderList(filter) {
+      list.innerHTML = '';
+      var q = (filter || '').toLowerCase();
+      var filtered = groups.filter(function(g) {
+        if (!q) return true;
+        return (g.code + ' ' + g.name + ' ' + g.facultyName).toLowerCase().indexOf(q) !== -1;
+      });
+      if (!filtered.length) { list.appendChild(el('div', { class: 'empty', text: 'Ничего не найдено' })); return; }
+      var byFac = {};
+      filtered.forEach(function(g) {
+        var key = g.facultyName || 'Другие';
+        if (!byFac[key]) byFac[key] = [];
+        byFac[key].push(g);
+      });
+      Object.keys(byFac).forEach(function(fac) {
+        list.appendChild(el('div', { class: 'group-picker-faculty', text: fac }));
+        byFac[fac].forEach(function(g) {
+          var item = el('div', { class: 'group-picker-item' + (g.code === state.user.group ? ' own' : '') }, [
+            el('div', { class: 'group-picker-code', text: g.code }),
+            el('div', { class: 'group-picker-meta', text: g.name + (g.course ? ' · ' + g.course + ' курс' : '') }),
+            g.code === state.user.group ? el('span', { class: 'group-picker-own', text: 'моя' }) : null
+          ]);
+          item.addEventListener('click', function() {
+            state.viewingGroup = g.code;
+            state.scheduleOffset = 0;
+            state.viewingTeacher = null;
+            overlay.remove();
+            renderSchedule();
+          });
+          list.appendChild(item);
+        });
+      });
+    }
+    renderList('');
+    searchInput.addEventListener('input', function() { renderList(searchInput.value); });
+    setTimeout(function() { searchInput.focus(); }, 100);
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+
+async function renderTeacherSchedule() {
+  main.innerHTML = '';
+  var teacherId = state.viewingTeacher;
+  if (!teacherId) { switchTab('schedule'); return; }
+  var offset = state.teacherScheduleOffset || 0;
+  var data = await api('/api/teachers/' + teacherId + '/schedule?offset=' + offset);
+  var weekdays = { mon: 'Понедельник', tue: 'Вторник', wed: 'Среда', thu: 'Четверг', fri: 'Пятница', sat: 'Суббота' };
+  var months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  var startD = new Date(data.weekStartDate + 'T00:00:00');
+  var endD = new Date(data.weekEndDate + 'T00:00:00');
+  var weekLabel = startD.getMonth() === endD.getMonth()
+    ? startD.getDate() + ' – ' + endD.getDate() + ' ' + months[startD.getMonth()] + ' ' + startD.getFullYear()
+    : startD.getDate() + ' ' + months[startD.getMonth()] + ' – ' + endD.getDate() + ' ' + months[endD.getMonth()] + ' ' + endD.getFullYear();
+
+  var topGroup = el('div', { class: 'group' });
+  topGroup.appendChild(el('div', { class: 'schedule-top-bar' }, [
+    el('div', { class: 'schedule-top-info' }, [
+      el('div', { class: 'schedule-group-code', text: data.teacherName }),
+      el('button', { class: 'schedule-group-back', text: '← к расписанию группы', onclick: function() {
+        state.viewingTeacher = null; state.teacherScheduleOffset = 0; renderSchedule();
+      }})
+    ])
+  ]));
+  main.appendChild(topGroup);
+
+  var headGroup = el('div', { class: 'group' });
+  var navRow = el('div', { class: 'schedule-week-header' });
+  navRow.appendChild(el('button', { class: 'schedule-arrow', text: '‹', onclick: function() {
+    state.teacherScheduleOffset = (state.teacherScheduleOffset || 0) - 1; renderTeacherSchedule();
+  }}));
+  var weekBtn = el('button', { class: 'schedule-week-btn' }, [
+    el('div', { class: 'schedule-week-btn-dates', text: weekLabel }),
+    el('div', { class: 'schedule-week-btn-meta' }, [
+      offset === 0 ? el('span', { class: 'schedule-current-marker', text: '• текущая' }) : null,
+      el('span', { class: 'schedule-week-chevron', text: '▾' })
+    ])
+  ]);
+  weekBtn.addEventListener('click', async function() {
+    var overlay = openOverlay();
+    var pop = overlay.querySelector('.popover');
+    pop.innerHTML = '<div class="empty">Загрузка...</div>';
+    try {
+      var weeks = await api('/api/teachers/' + teacherId + '/schedule/weeks');
+      renderWeeksList(weeks, overlay);
+    } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+  });
+  navRow.appendChild(weekBtn);
+  navRow.appendChild(el('button', { class: 'schedule-arrow', text: '›', onclick: function() {
+    state.teacherScheduleOffset = (state.teacherScheduleOffset || 0) + 1; renderTeacherSchedule();
+  }}));
+  headGroup.appendChild(navRow);
+  main.appendChild(headGroup);
+
+  var todayDow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][new Date().getDay()];
+  var hasAny = false;
+  ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].forEach(function(dayKey) {
+    var day = data.days.find(function(d) { return d.day === dayKey; });
+    if (!day || !day.lessons || !day.lessons.length) return;
+    hasAny = true;
+    var dowIndex = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].indexOf(dayKey);
+    var dayDate = new Date(startD);
+    dayDate.setDate(dayDate.getDate() + dowIndex);
+    var isToday = offset === 0 && dayKey === todayDow;
+    var dayGroup = el('div', { class: 'group' });
+    dayGroup.appendChild(el('div', { class: 'group-header' }, [
+      weekdays[dayKey] + ' · ' + dayDate.getDate() + ' ' + months[dayDate.getMonth()],
+      isToday ? el('span', { class: 'badge badge-editable', text: 'Сегодня' }) : null
+    ]));
+    day.lessons.forEach(function(l) {
+      var parts = l.time.split('–');
+      var roomText = l.room || '';
+      var buildingText = '';
+      var m = String(l.room || '').match(/^(\d+)[-–—](.+)$/);
+      if (m) { buildingText = 'Корпус ' + m[1]; roomText = 'ауд. ' + m[2]; }
+      dayGroup.appendChild(el('div', { class: 'schedule-row' }, [
+        el('div', { class: 'schedule-time' }, [el('div', { class: 'schedule-time-main', text: parts[0] }), el('div', { class: 'schedule-time-sub', text: parts[1] || '' })]),
+        el('div', { class: 'schedule-info' }, [
+          el('div', { class: 'schedule-subject', text: l.subject }),
+          el('div', { class: 'schedule-meta' }, [
+            el('span', { text: l.type }),
+            l.group ? el('span', { text: ' · ' }) : null,
+            l.group ? el('button', { class: 'schedule-teacher-btn', text: l.group, onclick: (function(gc) { return function() {
+              state.viewingGroup = gc; state.viewingTeacher = null; state.scheduleOffset = 0; renderSchedule();
+            }; })(l.group) }) : null
+          ]),
+          el('div', { class: 'schedule-location' }, [
+            el('span', { class: 'schedule-room', text: roomText }),
+            buildingText ? el('span', { class: 'schedule-building', text: buildingText }) : null
+          ])
+        ])
+      ]));
+    });
+    main.appendChild(dayGroup);
+  });
+  if (!hasAny) main.appendChild(el('div', { class: 'group' }, [el('div', { class: 'empty', text: 'У преподавателя пар нет на этой неделе' })]));
+}
+
+async function renderSearchSchedule() {
+  main.innerHTML = '';
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header', text: 'Поиск расписания' }));
+  var bar = el('div', { class: 'search-top-bar' });
+  var input = el('input', { class: 'search-top-input', type: 'text', placeholder: 'Группа или ФИО преподавателя' });
+  bar.appendChild(input);
+  group.appendChild(bar);
+  var results = el('div', { id: 'search-results' });
+  group.appendChild(results);
+  main.appendChild(group);
+
+  var timer;
+  input.addEventListener('input', function() {
+    clearTimeout(timer);
+    timer = setTimeout(async function() {
+      var q = input.value.trim();
+      results.innerHTML = '';
+      if (q.length < 2) { results.appendChild(el('div', { class: 'empty', text: 'Введите хотя бы 2 символа' })); return; }
+      try {
+        var data = await api('/api/search?q=' + encodeURIComponent(q));
+        if (data.groups.length) {
+          results.appendChild(el('div', { class: 'link-category', text: 'Группы' }));
+          data.groups.forEach(function(g) {
+            var row = el('div', { class: 'subject-row', onclick: function() {
+              state.viewingGroup = g.code; state.scheduleOffset = 0; state.viewingTeacher = null;
+              switchTab('schedule');
+            }}, [
+              el('div', { style: 'flex:1;' }, [el('div', { class: 'subject-name', text: g.code }), el('div', { class: 'subject-teacher', text: g.name || '' })]),
+              el('div', { class: 'chevron', text: '›' })
+            ]);
+            results.appendChild(row);
+          });
+        }
+        if (data.teachers.length) {
+          results.appendChild(el('div', { class: 'link-category', text: 'Преподаватели' }));
+          data.teachers.forEach(function(tch) {
+            var row = el('div', { class: 'subject-row', onclick: function() {
+              state.viewingTeacher = tch.id; state.teacherScheduleOffset = 0;
+              switchTab('teacher-schedule');
+            }}, [
+              avatarNode(tch, 'sm'),
+              el('div', { style: 'flex:1; margin-left:8px;' }, [el('div', { class: 'subject-name', text: tch.fullName }), el('div', { class: 'subject-teacher', text: tch.bio || 'Преподаватель' })]),
+              el('div', { class: 'chevron', text: '›' })
+            ]);
+            results.appendChild(row);
+          });
+        }
+        if (!data.groups.length && !data.teachers.length) results.appendChild(el('div', { class: 'empty', text: 'Ничего не найдено' }));
+      } catch (e) { results.appendChild(el('div', { class: 'empty', text: e.message })); }
+    }, 300);
+  });
+  setTimeout(function() { input.focus(); }, 100);
+}
+
+async function renderSubjects() {
+  main.innerHTML = '';
+  var code = state.viewingGroup || state.user.group;
+  var data = await api('/api/groups/' + encodeURIComponent(code) + '/subjects');
+  var pickerGroup = el('div', { class: 'group' });
+  pickerGroup.appendChild(el('div', { class: 'group-header', text: 'Курс' }));
+  var picker = el('div', { class: 'subject-course-picker' });
+  var currentCourse = state.subjectsCourse || '1';
+  Object.keys(data.courses || {}).forEach(function(c) {
+    var btn = el('button', { class: 'subject-course-btn' + (c === currentCourse ? ' active' : ''), text: c + ' курс', onclick: function() {
+      state.subjectsCourse = c; renderSubjects();
+    }});
+    picker.appendChild(btn);
+  });
+  pickerGroup.appendChild(picker);
+  main.appendChild(pickerGroup);
+  var listGroup = el('div', { class: 'group' });
+  listGroup.appendChild(el('div', { class: 'group-header', text: 'Предметы · ' + currentCourse + ' курс' }));
+  var subjects = (data.courses && data.courses[currentCourse]) || [];
+  if (!subjects.length) {
+    listGroup.appendChild(el('div', { class: 'empty', text: 'Нет данных' }));
+  } else {
+    subjects.forEach(function(s) {
+      var examClass = s.exam === 'Экзамен' ? 'exam-exam' : (s.exam === 'Зачёт' ? 'exam-credit' : 'exam-diff');
+      listGroup.appendChild(el('div', { class: 'subject-row', onclick: function() { openSubjectDetail(s); }}, [
+        el('div', { style: 'flex:1;' }, [el('div', { class: 'subject-name', text: s.name }), el('div', { class: 'subject-teacher', text: s.teacher })]),
+        el('div', { class: 'subject-exam ' + examClass, text: s.exam })
+      ]));
+    });
+  }
+  main.appendChild(listGroup);
+}
+
+function openSubjectDetail(s) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '';
+  pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: s.name }), el('p', { text: s.teacher + ' · ' + s.exam })]));
+  var sections = [];
+  if (s.hasLectures) sections.push({ icon: '🎓', name: 'Лекции' });
+  if (s.hasPractice) sections.push({ icon: '📝', name: 'Практики' });
+  if (s.hasLabs) sections.push({ icon: '🔬', name: 'Лабораторные работы' });
+  if (s.hasSeminars) sections.push({ icon: '💬', name: 'Семинары' });
+  if (s.hasCourseWork) sections.push({ icon: '📚', name: 'Курсовая работа' });
+  sections.push({ icon: '📊', name: s.exam });
+  sections.forEach(function(sec) {
+    pop.appendChild(el('div', { class: 'popover-item' }, [
+      el('div', { class: 'icon', style: 'background: var(--accent);', text: sec.icon }),
+      el('div', { class: 'label', text: sec.name }),
+      el('div', { class: 'chevron', text: '›' })
+    ]));
+  });
+  pop.appendChild(el('div', { style: 'padding: 12px 16px; font-size: 12px; color: var(--text-secondary); text-align: center; border-top: 1px solid var(--separator);', text: 'Оценки и посещения ставит преподаватель через eCampus' }));
+}
+
+async function renderRating() {
+  main.innerHTML = '';
+  var code = state.user.group;
+  var data = await api('/api/groups/' + encodeURIComponent(code) + '/rating');
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, ['Рейтинг группы', el('span', { class: 'badge badge-editable', text: 'всего пар: ' + data.totalLessons })]));
+  head.appendChild(el('div', { style: 'padding: 0 20px 16px; font-size:12px; color: var(--text-secondary); line-height:1.5;', text: 'Рейтинг = 60% посещаемость + 40% средний балл' }));
+  main.appendChild(head);
+  var list = el('div', { class: 'group' });
+  data.students.forEach(function(s) {
+    var placeClass = s.place === 1 ? 'top1' : (s.place === 2 ? 'top2' : (s.place === 3 ? 'top3' : ''));
+    list.appendChild(el('div', { class: 'rating-row' }, [
+      el('div', { class: 'rating-place ' + placeClass, text: String(s.place) }),
+      el('div', { class: 'rating-info' }, [
+        el('div', { class: 'rating-name', text: s.fullName }),
+        el('div', { class: 'rating-meta', text: 'Посещ. ' + s.attendPercent + '% · Оценки ' + (s.avgGrade || '—') })
+      ]),
+      el('div', { class: 'rating-score', text: s.rating, style: 'color:' + (s.rating >= 80 ? 'var(--green)' : s.rating >= 60 ? 'var(--orange)' : 'var(--red)') + ';' })
+    ]));
+  });
+  main.appendChild(list);
+}
+
+async function renderJournalReadOnly() {
+  var list = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/working');
+  main.innerHTML = '';
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header' }, ['Журнал группы', el('span', { class: 'badge badge-readonly', text: 'только чтение' })]));
+  var dates = [];
+  for (var i = 0; i < JOURNAL_DAYS; i++) dates.push(addDays(state.journalStart, i));
+  group.appendChild(el('div', { class: 'journal-toolbar' }, [
+    el('span', { class: 'range', text: fmtRangeLabel(dates[0], dates[dates.length-1]) }),
+    el('div', { class: 'nav-buttons' }, [
+      el('button', { text: '← Раньше', onclick: function() { state.journalStart = addDays(state.journalStart, -JOURNAL_DAYS); renderJournalReadOnly(); } }),
+      el('button', { text: 'Сегодня', onclick: function() { state.journalStart = startOfWeek(new Date()); renderJournalReadOnly(); } }),
+      el('button', { text: 'Позже →', onclick: function() { state.journalStart = addDays(state.journalStart, JOURNAL_DAYS); renderJournalReadOnly(); } })
+    ])
+  ]));
+  var wrapper = el('div', { class: 'journal-wrapper' });
+  wrapper.appendChild(buildJournalReadOnlyTable(list.students, dates));
+  group.appendChild(wrapper);
+  main.appendChild(group);
+}
+function buildJournalReadOnlyTable(students, dates) {
+  var weekdays = weekdaysShort();
+  var today = new Date();
+  var theadRow = el('tr', {});
+  theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
+  dates.forEach(function(d) {
+    var isToday = isSameDay(d, today);
+    theadRow.appendChild(el('th', { class: 'date-cell' + (isToday ? ' today' : '') }, [
+      el('div', { class: 'weekday', text: weekdays[d.getDay()] }),
+      el('div', { class: 'day', text: String(d.getDate()) })
+    ]));
+  });
+  var tbody = el('tbody', {});
+  students.forEach(function(s) {
+    var isSelf = s.userId === state.user.id;
+    var tr = el('tr', { class: isSelf ? 'self-row' : '' });
+    var nameCell = el('td', { class: 'name-col', text: s.fullName });
+    if (s.userId) nameCell.addEventListener('click', function() { openUserProfile(s.userId); });
+    tr.appendChild(nameCell);
+    dates.forEach(function(d) {
+      var iso = fmtISO(d);
+      var status = s.attendance && s.attendance[iso];
+      var td = el('td', { class: 'att-cell readonly' });
+      if (status) {
+        var labels = { absent: 'Н', excused: 'У', drone: 'С' };
+        td.appendChild(el('span', { class: 'status-badge ' + status, text: labels[status] || '?' }));
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  return el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]);
+}
+
+async function renderStats() {
+  main.innerHTML = '';
+  if (state.user.role === 'starosta') await renderGroupStatsTab();
+  else await renderMyStatsTab();
+}
+async function renderMyStatsTab() {
+  var stats = await api('/api/users/' + state.user.id + '/full-stats');
+  renderDonutChart(stats, 'Посещаемость');
+  var statsGrid = el('div', { class: 'group' });
+  statsGrid.appendChild(el('div', { class: 'group-header', text: 'Детально' }));
+  statsGrid.appendChild(el('div', { class: 'stats-grid' }, [
+    el('div', { class: 'stat-cell red' }, [el('div', { class: 'num', text: String(stats.absent) }), el('div', { class: 'lbl', text: 'пропуск' })]),
+    el('div', { class: 'stat-cell indigo' }, [el('div', { class: 'num', text: String(stats.excused) }), el('div', { class: 'lbl', text: 'уваж.' })]),
+    el('div', { class: 'stat-cell orange' }, [el('div', { class: 'num', text: String(stats.drone) }), el('div', { class: 'lbl', text: 'БПЛА' })])
+  ]));
+  main.appendChild(statsGrid);
+  if (stats.averageGrade !== null) {
+    var gg = el('div', { class: 'group' });
+    gg.appendChild(el('div', { class: 'group-header', text: 'Средний балл' }));
+    gg.appendChild(el('div', { style: 'padding:16px 20px 20px; text-align:center;' }, [
+      el('div', { style: 'font-size:52px; font-weight:700; letter-spacing:-0.04em; color:var(--tab-accent);', text: stats.averageGrade }),
+      el('div', { style: 'font-size:13px; color:var(--text-secondary); margin-top:4px;', text: 'по ' + stats.grades.length + ' предметам' })
+    ]));
+    main.appendChild(gg);
+  }
+  if (stats.absences && stats.absences.length) {
+    var ag = el('div', { class: 'group' });
+    ag.appendChild(el('div', { class: 'group-header' }, ['Пропуски', el('span', { class: 'badge badge-important', text: String(stats.absences.length) })]));
+    stats.absences.forEach(function(a) { ag.appendChild(buildAbsenceCard(a)); });
+    main.appendChild(ag);
+  }
+}
+async function renderGroupStatsTab() {
+  var stats = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/stats');
+  renderDonutChart(stats.totals, 'Посещаемость группы', stats.groupPercent);
+  var listGroup = el('div', { class: 'group' });
+  listGroup.appendChild(el('div', { class: 'group-header', text: 'По студентам' }));
+  stats.students.forEach(function(s) {
+    listGroup.appendChild(el('div', { class: 'row clickable', onclick: function() { if (s.userId) openFullStats(s.userId); } }, [
+      el('div', { class: 'idx', text: String(s.percent) + '%' }),
+      el('div', { class: 'name', text: s.fullName }),
+      el('div', { class: 'chevron', text: '›' })
+    ]));
+  });
+  main.appendChild(listGroup);
+}
+async function openFullStats(userId) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var user = await api('/api/users/' + userId);
+    var stats = await api('/api/users/' + userId + '/full-stats');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: user.fullName }), el('p', { text: 'Посещаемость: ' + stats.percent + '%' })]));
+    pop.appendChild(el('div', { html: buildDonutSVG(stats, 160), style: 'display:flex; justify-content:center; padding:16px;' }));
+    pop.appendChild(el('div', { class: 'stats-grid', style: 'padding:0 16px 16px;' }, [
+      el('div', { class: 'stat-cell red' }, [el('div', { class: 'num', text: String(stats.absent) }), el('div', { class: 'lbl', text: 'пропуск' })]),
+      el('div', { class: 'stat-cell indigo' }, [el('div', { class: 'num', text: String(stats.excused) }), el('div', { class: 'lbl', text: 'уваж.' })]),
+      el('div', { class: 'stat-cell orange' }, [el('div', { class: 'num', text: String(stats.drone) }), el('div', { class: 'lbl', text: 'БПЛА' })])
+    ]));
+    if (stats.absences && stats.absences.length) {
+      var absWrap = el('div', { style: 'padding: 12px 16px; border-top: 1px solid var(--separator);' });
+      absWrap.appendChild(el('div', { style: 'font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600; margin-bottom:8px;', text: 'Пропуски' }));
+      stats.absences.forEach(function(a) { absWrap.appendChild(buildAbsenceCard(a)); });
+      pop.appendChild(absWrap);
+    }
+  } catch(e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+function buildDonutSVG(stats, size) {
+  size = size || 200;
+  var radius = size / 2 - 12;
+  var stroke = 18;
+  var center = size / 2;
+  var circumference = 2 * Math.PI * radius;
+  var values = [
+    { value: stats.excused || 0, color: '#5856d6' },
+    { value: stats.drone || 0, color: '#ff9500' },
+    { value: stats.absent || 0, color: '#ff3b30' }
+  ];
+  var total = values.reduce(function(s,v) { return s + v.value; }, 0);
+  var parts = ['<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'];
+  parts.push('<circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="none" stroke="rgba(120,120,128,0.15)" stroke-width="' + stroke + '"/>');
+  var offset = 0;
+  if (total > 0) {
+    values.forEach(function(v) {
+      if (v.value === 0) return;
+      var dash = (v.value / total) * circumference;
+      parts.push('<circle cx="' + center + '" cy="' + center + '" r="' + radius + '" fill="none" stroke="' + v.color + '" stroke-width="' + stroke + '" stroke-dasharray="' + dash + ' ' + (circumference - dash) + '" stroke-dashoffset="' + (-offset) + '" transform="rotate(-90 ' + center + ' ' + center + ')"/>');
+      offset += dash;
+    });
+  }
+  var percent = stats.percent || (total ? Math.round(((stats.excused + stats.drone) / total) * 100) : 0);
+  parts.push('<text x="' + center + '" y="' + (center + 4) + '" text-anchor="middle" font-size="34" font-weight="700" fill="currentColor">' + percent + '%</text>');
+  parts.push('<text x="' + center + '" y="' + (center + 24) + '" text-anchor="middle" font-size="11" fill="rgba(120,120,128,0.8)">посещаемость</text>');
+  parts.push('</svg>');
+  return parts.join('');
+}
+function renderDonutChart(stats, title) {
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header', text: title }));
+  var wrap = el('div', { style: 'display:flex; justify-content:center; padding:20px 16px 24px;' });
+  wrap.innerHTML = buildDonutSVG(stats, 220);
+  group.appendChild(wrap);
+  var legend = el('div', { style: 'display:flex; justify-content:center; gap:16px; flex-wrap:wrap; padding:0 16px 20px;' });
+  [
+    { label: 'Уваж.', color: '#5856d6', value: stats.excused },
+    { label: 'БПЛА', color: '#ff9500', value: stats.drone },
+    { label: 'Не был', color: '#ff3b30', value: stats.absent }
+  ].forEach(function(l) {
+    legend.appendChild(el('div', { style: 'display:flex; align-items:center; gap:6px; font-size:13px;' }, [
+      el('div', { style: 'width:12px; height:12px; border-radius:50%; background:' + l.color + ';' }),
+      el('span', { style: 'color:var(--text-secondary);', text: l.label }),
+      el('span', { style: 'font-weight:600;', text: String(l.value || 0) })
+    ]));
+  });
+  group.appendChild(legend);
+  main.appendChild(group);
+}
+function buildAbsenceCard(a) {
+  var statusColor = a.status === 'absent' ? 'var(--red)' : 'var(--orange)';
+  var statusLabel = a.status === 'absent' ? 'Не был' : 'БПЛА';
+  var countLabel = a.lessonsCount ? ' · ' + a.lessonsCount + ' ' + plural(a.lessonsCount, 'пара', 'пары', 'пар') : '';
+  var card = el('div', { class: 'absence-card' });
+  card.appendChild(el('div', { class: 'absence-header' }, [
+    el('div', { class: 'absence-date-block' }, [
+      el('div', { class: 'absence-date', text: formatDate(a.date) }),
+      el('div', { class: 'absence-weekday', text: a.weekday || '' })
+    ]),
+    el('div', { class: 'absence-status', style: 'color:' + statusColor + ';', text: statusLabel + countLabel })
+  ]));
+  if (a.lessons && a.lessons.length) {
+    var lessonsWrap = el('div', { class: 'absence-lessons' });
+    a.lessons.forEach(function(l) {
+      var parts = (l.time || '').split('–');
+      var roomText = l.room || '';
+      var m = String(l.room || '').match(/^(\d+)[-–—](.+)$/);
+      if (m) roomText = 'Корпус ' + m[1] + ' · ауд. ' + m[2];
+      lessonsWrap.appendChild(el('div', { class: 'absence-lesson' }, [
+        el('div', { class: 'absence-lesson-time' }, [
+          el('div', { class: 'absence-lesson-time-main', text: parts[0] || '' }),
+          el('div', { class: 'absence-lesson-time-sub', text: parts[1] || '' })
+        ]),
+        el('div', { class: 'absence-lesson-info' }, [
+          el('div', { class: 'absence-lesson-subject', text: l.subject }),
+          el('div', { class: 'absence-lesson-meta', text: (l.type || '') + (l.teacher ? ' · ' + l.teacher : '') }),
+          roomText ? el('div', { class: 'absence-lesson-room', text: roomText }) : null
+        ])
+      ]));
+    });
+    card.appendChild(lessonsWrap);
+  } else {
+    card.appendChild(el('div', { class: 'absence-no-lessons', text: 'Расписание на этот день не найдено' }));
+  }
+  return card;
+}
+function plural(n, one, few, many) {
+  var mod10 = n % 10;
+  var mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
+
+async function renderOfficial() {
+  var list = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/official');
+  main.innerHTML = '';
+  var group = el('div', { class: 'group' }, [el('div', { class: 'group-header' }, ['Студенты группы', el('span', { class: 'badge badge-readonly', text: 'только чтение' })])]);
+  var body = el('div', { class: 'group-body' });
+  for (var i = 0; i < list.length; i++) {
+    var s = list[i];
+    var row = el('div', { class: 'row clickable' }, [
+      el('div', { class: 'idx', text: String(i + 1) }),
+      el('div', { class: 'name' }, [
+        s.individualPlan ? el('span', { style: 'color: var(--accent); font-weight:700; margin-right: 6px;', text: '★' }) : null,
+        el('span', { text: s.fullName })
+      ]),
+      el('div', { class: 'zach', text: s.zachetka || '' }),
+      el('div', { class: 'chevron', text: '›' })
+    ]);
+    if (s.userId) row.addEventListener('click', (function(uid) { return function() { openUserProfile(uid); }; })(s.userId));
+    body.appendChild(row);
+  }
+  group.appendChild(body);
+  main.appendChild(group);
+}
+
+async function renderWorking() {
+  var list = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/working');
+  window._workingData = list;
+  main.innerHTML = '';
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header' }, ['Журнал посещаемости', el('span', { class: 'badge badge-editable', text: 'нажмите на ячейку' })]));
+  var dates = [];
+  for (var i = 0; i < JOURNAL_DAYS; i++) dates.push(addDays(state.journalStart, i));
+  group.appendChild(el('div', { class: 'journal-toolbar' }, [
+    el('span', { class: 'range', text: fmtRangeLabel(dates[0], dates[dates.length-1]) }),
+    el('div', { class: 'nav-buttons' }, [
+      el('button', { text: '← Раньше', onclick: function() { state.journalStart = addDays(state.journalStart, -JOURNAL_DAYS); renderWorking(); } }),
+      el('button', { text: 'Сегодня', onclick: function() { state.journalStart = startOfWeek(new Date()); renderWorking(); } }),
+      el('button', { text: 'Позже →', onclick: function() { state.journalStart = addDays(state.journalStart, JOURNAL_DAYS); renderWorking(); } }),
+      el('button', { text: 'Экспорт CSV', onclick: exportCSV })
+    ])
+  ]));
+  var wrapper = el('div', { class: 'journal-wrapper' });
+  wrapper.appendChild(buildJournalTable(list.students, dates));
+  group.appendChild(wrapper);
+  main.appendChild(group);
+}
+function buildJournalTable(students, dates) {
+  var weekdays = weekdaysShort();
+  var today = new Date();
+  var theadRow = el('tr', {});
+  theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
+  dates.forEach(function(d) {
+    var isToday = isSameDay(d, today);
+    theadRow.appendChild(el('th', { class: 'date-cell' + (isToday ? ' today' : '') }, [
+      el('div', { class: 'weekday', text: weekdays[d.getDay()] }),
+      el('div', { class: 'day', text: String(d.getDate()) })
+    ]));
+  });
+  var tbody = el('tbody', {});
+  students.forEach(function(s) {
+    var tr = el('tr', {});
+    var nameCell = el('td', { class: 'name-col', text: s.fullName });
+    if (s.userId) nameCell.addEventListener('click', function() { openUserProfile(s.userId); });
+    tr.appendChild(nameCell);
+    dates.forEach(function(d) {
+      var iso = fmtISO(d);
+      var status = s.attendance && s.attendance[iso];
+      var td = el('td', { class: 'att-cell' });
+      if (status) {
+        var labels = { absent: 'Н', excused: 'У', drone: 'С' };
+        td.appendChild(el('span', { class: 'status-badge ' + status, text: labels[status] || '?' }));
+      }
+      td.addEventListener('click', function() { openAttendancePopover(s.id, iso, status); });
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  return el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]);
+}
+async function exportCSV() {
+  try {
+    var blob = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/working/export.csv');
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'journal-' + state.user.group + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { toast(e.message, true); }
+}
+function openAttendancePopover(studentId, date, currentStatus) {
+  var students = window._workingData?.students || [];
+  var student = students.find(function(s) { return s.id === studentId; });
+  if (!student) return;
+  var overlay = openOverlay();
+  var popover = overlay.querySelector('.popover');
+  var d = new Date(date + 'T00:00:00');
+  var months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  popover.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: student.fullName }), el('p', { text: d.getDate() + ' ' + months[d.getMonth()] })]));
+  [
+    { key: 'absent', label: 'Не был', icon: 'Н' },
+    { key: 'excused', label: 'Уважительная', icon: 'У' },
+    { key: 'drone', label: 'Беспилотная опасность', icon: 'С' }
+  ].forEach(function(opt) {
+    var item = el('div', { class: 'popover-item ' + opt.key }, [
+      el('div', { class: 'icon', text: opt.icon }),
+      el('div', { class: 'label', text: opt.label })
+    ]);
+    if (currentStatus === opt.key) item.appendChild(el('div', { class: 'check', text: '✓' }));
+    item.addEventListener('click', async function() { overlay.remove(); await setAttendance(studentId, date, opt.key); });
+    popover.appendChild(item);
+  });
+  if (currentStatus) {
+    var clearItem = el('div', { class: 'popover-item clear' }, [el('div', { class: 'icon', text: '×' }), el('div', { class: 'label', text: 'Убрать отметку' })]);
+    clearItem.addEventListener('click', async function() { overlay.remove(); await clearAttendance(studentId, date); });
+    popover.appendChild(clearItem);
+  }
+}
+async function setAttendance(studentId, date, status) {
+  try {
+    var updated = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/working/' + studentId + '/attendance', { method:'POST', body: JSON.stringify({ date, status }) });
+    var list = window._workingData;
+    var idx = list.students.findIndex(function(s) { return s.id === studentId; });
+    if (idx >= 0) list.students[idx] = updated;
+    renderWorking();
+    toast('Отмечено');
+  } catch(e) { toast(e.message, true); }
+}
+async function clearAttendance(studentId, date) {
+  try {
+    var updated = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/working/' + studentId + '/attendance/' + date, { method:'DELETE' });
+    var list = window._workingData;
+    var idx = list.students.findIndex(function(s) { return s.id === studentId; });
+    if (idx >= 0) list.students[idx] = updated;
+    renderWorking();
+    toast('Убрано');
+  } catch(e) { toast(e.message, true); }
+}
+
+async function renderStarostasCatalog() {
+  main.innerHTML = '';
+  var data = await api('/api/starostas');
+  var starostas = data.starostas || [];
+  var faculties = data.faculties || [];
+  var filterGroup = el('div', { class: 'group' });
+  filterGroup.appendChild(el('div', { class: 'group-header', text: 'Фильтры' }));
+  var filterRow = el('div', { class: 'filter-row' });
+  var facultySelect = el('select', { id: 'filter-faculty' }, [el('option', { value: '', text: 'Все факультеты' })].concat(faculties.map(function(f) { return el('option', { value: f.id, text: f.shortName || f.name }); })));
+  var courseSelect = el('select', { id: 'filter-course' }, [el('option', { value: '', text: 'Все курсы' }), el('option', { value: '1', text: '1 курс' }), el('option', { value: '2', text: '2 курс' }), el('option', { value: '3', text: '3 курс' }), el('option', { value: '4', text: '4 курс' })]);
+  var searchInput = el('input', { type:'text', placeholder:'Поиск по ФИО или группе', value: state.filterSearch });
+  facultySelect.value = state.filterFaculty; courseSelect.value = state.filterCourse;
+  filterRow.appendChild(facultySelect); filterRow.appendChild(courseSelect); filterRow.appendChild(searchInput);
+  filterGroup.appendChild(filterRow); main.appendChild(filterGroup);
+  facultySelect.addEventListener('change', function() { state.filterFaculty = facultySelect.value; renderStarostasCatalog(); });
+  courseSelect.addEventListener('change', function() { state.filterCourse = courseSelect.value; renderStarostasCatalog(); });
+  var timer;
+  searchInput.addEventListener('input', function() { clearTimeout(timer); timer = setTimeout(function() { state.filterSearch = searchInput.value.trim().toLowerCase(); renderStarostasCatalog(); }, 300); });
+  var filtered = starostas.filter(function(s) {
+    if (state.filterFaculty && s.facultyId !== state.filterFaculty) return false;
+    if (state.filterCourse && String(s.course) !== state.filterCourse) return false;
+    if (state.filterSearch) {
+      var hay = (s.fullName + ' ' + (s.group || '')).toLowerCase();
+      if (hay.indexOf(state.filterSearch) === -1) return false;
+    }
+    return true;
+  });
+  if (!filtered.length) { main.appendChild(el('div', { class: 'group' }, [el('div', { class: 'empty', text: 'Никого не найдено' })])); return; }
+  var byFaculty = {};
+  filtered.forEach(function(s) {
+    var fid = s.facultyId || 'other';
+    if (!byFaculty[fid]) byFaculty[fid] = { name: s.facultyName, short: s.facultyShort, courses: {} };
+    var c = s.course || 0;
+    if (!byFaculty[fid].courses[c]) byFaculty[fid].courses[c] = [];
+    byFaculty[fid].courses[c].push(s);
+  });
+  Object.keys(byFaculty).forEach(function(fid) {
+    var fac = byFaculty[fid];
+    var groupBlock = el('div', { class: 'group' });
+    groupBlock.appendChild(el('div', { class: 'faculty-header', text: fac.short ? fac.short + ' · ' + fac.name : fac.name }));
+    Object.keys(fac.courses).sort(function(a,b) { return Number(a) - Number(b); }).forEach(function(ck) {
+      groupBlock.appendChild(el('div', { class: 'faculty-subheader', text: ck + ' курс' }));
+      fac.courses[ck].sort(function(a,b) { return (a.group || '').localeCompare(b.group || ''); }).forEach(function(s) {
+        groupBlock.appendChild(el('div', { class: 'row clickable', onclick: function() { openUserProfile(s.id); } }, [
+          avatarNode(s, 'sm'),
+          el('div', { style: 'flex:1; min-width:0;' }, [
+            el('div', { style: 'font-weight:500; font-size:15px;', text: s.fullName }),
+            el('div', { style: 'color:var(--text-secondary); font-size:13px; margin-top:1px;', text: s.group + (s.groupName ? ' · ' + s.groupName : '') })
+          ]),
+          el('div', { class: 'chevron', text: '›' })
+        ]));
+      });
+    });
+    main.appendChild(groupBlock);
+  });
+}
+
+async function renderServices() {
+  main.innerHTML = '';
+  var services = [];
+
+  if (state.user.role === 'starosta') {
+    services.push(
+      { key: 'search', icon: '🔍', color: '#5856d6', title: 'Поиск расписания', desc: 'Группы и преподаватели' },
+      { key: 'subjects', icon: '📚', color: '#007aff', title: 'Предметы', desc: 'По курсам' },
+      { key: 'rating', icon: '🏆', color: '#ff9500', title: 'Рейтинг группы', desc: 'Статистика' },
+      { key: 'birthdays', icon: '🎂', color: '#ff2d55', title: 'Дни рождения', desc: 'Ближайшие' },
+      { key: 'teachers', icon: '👨‍🏫', color: '#34c759', title: 'Все преподаватели', desc: 'С фильтром' },
+      { key: 'campus', icon: '🗺️', color: '#8e8e93', title: 'Карта корпусов', desc: 'Яндекс + планы' },
+      { key: 'dormitories', icon: '🏠', color: '#af52de', title: 'Общежития', desc: 'Адреса и телефоны' },
+      { key: 'links', icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки', desc: 'ЭИОС, библиотеки' },
+      { key: 'starostas', icon: '👥', color: '#5856d6', title: 'Каталог старост', desc: 'Все старосты' }
+    );
+  } else if (state.user.role === 'student') {
+    services.push(
+      { key: 'search', icon: '🔍', color: '#5856d6', title: 'Поиск расписания', desc: 'Группы и преподаватели' },
+      { key: 'subjects', icon: '📚', color: '#007aff', title: 'Предметы', desc: 'По курсам' },
+      { key: 'rating', icon: '🏆', color: '#ff9500', title: 'Рейтинг группы', desc: 'Моё место' },
+      { key: 'birthdays', icon: '🎂', color: '#ff2d55', title: 'Дни рождения', desc: 'Ближайшие' },
+      { key: 'teachers', icon: '👨‍🏫', color: '#34c759', title: 'Все преподаватели', desc: 'С фильтром' },
+      { key: 'campus', icon: '🗺️', color: '#8e8e93', title: 'Карта корпусов', desc: 'Яндекс + планы' },
+      { key: 'dormitories', icon: '🏠', color: '#af52de', title: 'Общежития', desc: 'Адреса и телефоны' },
+      { key: 'links', icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки', desc: 'ЭИОС, библиотеки' }
+    );
+  } else if (state.user.role === 'teacher' || state.user.role === 'curator') {
+  services.push(
+      { key: 'announcements', icon: '📢', color: '#ff2d55', title: 'Объявления', desc: 'Мои объявления' },
+      { key: 'materials', icon: '📚', color: '#007aff', title: 'Материалы', desc: 'Файлы для групп' },
+      { key: 'office', icon: '🕐', color: '#ff9500', title: 'Приём и консультации', desc: 'Мои часы' },
+      { key: 'profile', icon: '👤', color: '#34c759', title: 'Мой профиль', desc: 'Настройки' },
+      { key: 'search', icon: '🔍', color: '#5856d6', title: 'Поиск расписания', desc: 'Группы и преподаватели' },
+      { key: 'teachers', icon: '👨‍🏫', color: '#34c759', title: 'Все преподаватели', desc: 'С фильтром по факультету' },
+      { key: 'campus', icon: '🗺️', color: '#8e8e93', title: 'Карта корпусов', desc: 'Яндекс + планы' },
+      { key: 'dormitories', icon: '🏠', color: '#af52de', title: 'Общежития', desc: 'Адреса и телефоны' },
+      { key: 'links', icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки', desc: 'ЭИОС, библиотеки' }
+    );
+  }
+
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header', text: 'Сервисы' }));
+  services.forEach(function(s) {
+    group.appendChild(el('div', { class: 'row clickable', onclick: function() { openService(s.key); } }, [
+      el('div', { class: 'avatar', style: 'background:' + s.color + '; width:42px; height:42px; border-radius:12px;', text: s.icon }),
+      el('div', { style: 'flex:1;' }, [
+        el('div', { style: 'font-weight:600; font-size:15px;', text: s.title }),
+        el('div', { style: 'color:var(--text-secondary); font-size:13px; margin-top:2px;', text: s.desc })
+      ]),
+      el('div', { class: 'chevron', text: '›' })
+    ]));
+  });
+  main.appendChild(group);
+}
+async function openService(key) {
+  switch (key) {
+    case 'search': switchTab('search'); break;
+    case 'subjects': switchTab('subjects'); break;
+    case 'rating': switchTab('rating'); break;
+    case 'starostas': switchTab('starostas'); break;
+    case 'birthdays': await showBirthdays(); break;
+    case 'teachers': await showAllTeachers(); break;
+    case 'campus': await showCampusNew(); break;
+    case 'dormitories': await showDormitories(); break;
+    case 'links': await showLinks(); break;
+    default: toast('Скоро');
+    case 'announcements': switchTab('announcements'); break;
+    case 'materials': switchTab('materials'); break;
+    case 'office': switchTab('office'); break;
+    case 'profile': switchTab('profile'); break;
+  }
+}
+async function showAllTeachers() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var teachers = await api('/api/teachers');
+    var faculties = await api('/api/faculties');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Все преподаватели' })]));
+    var filter = el('select', { style: 'margin: 8px 16px; padding: 10px 14px; border-radius: 12px; background: var(--gray-bg); border:none; font-family: inherit; font-size: 14px; width: calc(100% - 32px);' });
+    filter.appendChild(el('option', { value: '', text: 'Все факультеты' }));
+    faculties.forEach(function(f) { filter.appendChild(el('option', { value: f.id, text: f.shortName })); });
+    pop.appendChild(filter);
+    var list = el('div');
+    pop.appendChild(list);
+    function render(fac) {
+      list.innerHTML = '';
+      teachers.filter(function(t) { return !fac || t.faculty === fac; }).forEach(function(t) {
+        var item = el('div', { class: 'popover-item', onclick: function() {
+          overlay.remove();
+          state.viewingTeacher = t.id;
+          state.teacherScheduleOffset = 0;
+          switchTab('teacher-schedule');
+        }}, [
+          avatarNode(t, 'sm'),
+          el('div', { class: 'label' }, [
+            el('div', { style: 'font-size: 14px; font-weight: 500;', text: t.fullName }),
+            el('div', { style: 'font-size: 12px; color: var(--text-secondary);', text: t.bio || 'Преподаватель' })
+          ])
+        ]);
+        list.appendChild(item);
+      });
+    }
+    render('');
+    filter.addEventListener('change', function() { render(filter.value); });
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+async function showBirthdays() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var list = await api('/api/groups/' + encodeURIComponent(state.user.group) + '/birthdays');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Дни рождения' })]));
+    if (!list.length) { pop.appendChild(el('div', { class: 'empty', text: 'Нет данных' })); return; }
+    list.forEach(function(u) {
+      var d = new Date(u.birthday + 'T00:00:00');
+      var months = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+      pop.appendChild(el('div', { class: 'popover-item' }, [
+        el('div', { class: 'icon', style: 'background: linear-gradient(160deg, #ff2d55, #af52de);', text: '🎂' }),
+        el('div', { class: 'label' }, [
+          el('div', { style: 'font-size:14px; font-weight:500;', text: u.fullName }),
+          el('div', { style: 'font-size:12px; color:var(--text-secondary);', text: d.getDate() + ' ' + months[d.getMonth()] })
+        ])
+      ]));
+    });
+  } catch(e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+async function showCampusNew() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var list = await api('/api/campus');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Карта корпусов' })]));
+    list.forEach(function(c) {
+      var item = el('div', { style: 'padding: 12px 16px; border-top: 1px solid var(--separator);' });
+      item.appendChild(el('div', { style: 'font-weight:600; font-size:14px; margin-bottom:4px;', text: c.name }));
+      item.appendChild(el('div', { style: 'font-size:12px; color:var(--text-secondary); margin-bottom:10px;', text: c.address }));
+      var actions = el('div', { class: 'campus-actions', style: 'padding:0;' });
+      actions.appendChild(el('button', { text: '📍 Яндекс.Карты', onclick: function() {
+        window.open(c.mapUrl || ('https://yandex.ru/maps/?text=' + encodeURIComponent(c.address)), '_blank');
+      }}));
+      actions.appendChild(el('button', { class: 'alt', text: '🗺️ Планы этажей', onclick: function() {
+        if (c.plansFolder) window.open('/plans/' + c.plansFolder + '/1.png', '_blank');
+        else toast('Планы для этого корпуса пока не загружены');
+      }}));
+      item.appendChild(actions);
+      pop.appendChild(item);
+    });
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+async function showDormitories() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var list = await api('/api/dormitories');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Общежития' })]));
+    list.forEach(function(d) {
+      var row = el('div', { class: 'dorm-row' });
+      row.appendChild(el('div', { class: 'dorm-name', text: d.name }));
+      row.appendChild(el('div', { class: 'dorm-addr', text: d.address }));
+      row.appendChild(el('div', { class: 'dorm-info', text: d.info || '' }));
+      row.appendChild(el('div', { class: 'dorm-info', text: '📞 ' + (d.phone || '') }));
+      var actions = el('div', { class: 'dorm-actions' });
+      actions.appendChild(el('a', { href: d.mapUrl, target: '_blank', text: '📍 На карте' }));
+      row.appendChild(actions);
+      pop.appendChild(row);
+    });
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+async function showLinks() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var list = await api('/api/links');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Полезные ссылки' })]));
+    var byCat = {};
+    list.forEach(function(l) {
+      if (!byCat[l.category]) byCat[l.category] = [];
+      byCat[l.category].push(l);
+    });
+    Object.keys(byCat).forEach(function(cat) {
+      pop.appendChild(el('div', { class: 'link-category', text: cat }));
+      byCat[cat].forEach(function(l) {
+        var row = el('a', { href: l.url, target: '_blank', class: 'ext-link', style: 'text-decoration:none; color:inherit;' }, [
+          el('div', { class: 'ext-link-icon', style: 'background: ' + l.color + '20;', text: l.icon }),
+          el('div', { class: 'ext-link-info' }, [el('h4', { text: l.title }), el('p', { text: l.desc })]),
+          el('div', { class: 'ext-link-chevron', text: '›' })
+        ]);
+        pop.appendChild(row);
+      });
+    });
+  } catch (e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+
+async function renderAnnouncements() {
+  var items = await api('/api/announcements');
+  main.innerHTML = '';
+  if (state.user.role === 'teacher') {
+    var groupsData = await api('/api/groups');
+    var myGroups = groupsData.filter(function(g) { return state.user.groups?.includes(g.code); });
+    var form = el('div', { class: 'group' });
+    form.appendChild(el('div', { class: 'group-header', text: 'Новое объявление' }));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Группы' }), el('div', { id: 'ann-groups', style: 'display:flex; gap:8px; flex-wrap:wrap;' }, myGroups.map(function(g) { return el('label', { style: 'display:flex; align-items:center; gap:6px; font-size:14px; cursor:pointer;' }, [el('input', { type: 'checkbox', value: g.code }), g.code]); }))]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Заголовок' }), el('input', { id: 'ann-title', type: 'text' })]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Текст' }), el('textarea', { id: 'ann-text' })]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Важность' }), el('select', { id: 'ann-priority' }, [el('option', { value: 'normal', text: 'Обычное' }), el('option', { value: 'important', text: 'Важное' })])]));
+    form.appendChild(el('div', { class: 'form-actions' }, [el('button', { class: 'btn', text: 'Опубликовать', onclick: addAnnouncement })]));
+    main.appendChild(form);
+  }
+  var list = el('div', { class: 'group' });
+  list.appendChild(el('div', { class: 'group-header', text: state.user.role === 'teacher' ? 'Мои объявления' : 'Объявления' }));
+  if (!items.length) list.appendChild(el('div', { class: 'empty', text: 'Пока нет' }));
+  else items.forEach(function(a) {
+    list.appendChild(el('div', { class: 'event-row' }, [
+      el('div', { class: 'event-dot' + (a.priority === 'important' ? ' important' : '') }),
+      el('div', { class: 'event-content' }, [el('h4', { text: a.title }), el('p', { text: a.text }), el('div', { class: 'date', text: a.authorName + ' · ' + formatDate(a.createdAt) })]),
+      state.user.role === 'teacher' ? el('button', { class: 'delete-btn', text: 'Удалить', onclick: function() { deleteAnnouncement(a.id); } }) : null
+    ]));
+  });
+  main.appendChild(list);
+}
+async function addAnnouncement() {
+  var groupBoxes = document.querySelectorAll('#ann-groups input[type=checkbox]:checked');
+  var groups = Array.from(groupBoxes).map(function(b) { return b.value; });
+  var title = document.getElementById('ann-title').value.trim();
+  var text = document.getElementById('ann-text').value.trim();
+  var priority = document.getElementById('ann-priority').value;
+  if (!groups.length) { toast('Выберите группу', true); return; }
+  if (!title || !text) { toast('Заполните всё', true); return; }
+  try {
+    await api('/api/announcements', { method:'POST', body: JSON.stringify({ groups, title, text, priority }) });
+    toast('Опубликовано'); renderAnnouncements();
+  } catch(e) { toast(e.message, true); }
+}
+async function deleteAnnouncement(id) {
+  if (!confirm('Удалить?')) return;
+  try { await api('/api/announcements/' + id, { method: 'DELETE' }); renderAnnouncements(); }
+  catch(e) { toast(e.message, true); }
+}
+
+async function renderMaterials() {
+  var items = await api('/api/materials');
+  main.innerHTML = '';
+  if (state.user.role === 'teacher') {
+    var groupsData = await api('/api/groups');
+    var myGroups = groupsData.filter(function(g) { return state.user.groups?.includes(g.code); });
+    var form = el('div', { class: 'group' });
+    form.appendChild(el('div', { class: 'group-header', text: 'Новый материал' }));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Группа' }), el('select', { id: 'mat-group' }, myGroups.map(function(g) { return el('option', { value: g.code, text: g.code }); }))]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Предмет' }), el('input', { id: 'mat-subject', type: 'text' })]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Название' }), el('input', { id: 'mat-title', type: 'text' })]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Ссылка' }), el('input', { id: 'mat-url', type: 'text', placeholder: 'https://...' })]));
+    form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Описание' }), el('input', { id: 'mat-desc', type: 'text' })]));
+    form.appendChild(el('div', { class: 'form-actions' }, [el('button', { class: 'btn', text: 'Добавить', onclick: addMaterial })]));
+    main.appendChild(form);
+  }
+  var list = el('div', { class: 'group' });
+  list.appendChild(el('div', { class: 'group-header', text: 'Материалы' }));
+  if (!items.length) list.appendChild(el('div', { class: 'empty', text: 'Пусто' }));
+  else items.forEach(function(m) {
+    list.appendChild(el('div', { class: 'event-row' }, [
+      el('div', { class: 'event-dot' }),
+      el('div', { class: 'event-content' }, [
+        el('h4', {}, [el('a', { href: m.url, target: '_blank', style: 'color:var(--accent); text-decoration:none;', text: m.title })]),
+        m.subject ? el('p', { text: m.subject + (m.description ? ' · ' + m.description : '') }) : null,
+        el('div', { class: 'date', text: m.authorName + ' · ' + m.group + ' · ' + formatDate(m.createdAt) })
+      ]),
+      state.user.role === 'teacher' ? el('button', { class: 'delete-btn', text: 'Удалить', onclick: function() { deleteMaterial(m.id); } }) : null
+    ]));
+  });
+  main.appendChild(list);
+}
+async function addMaterial() {
+  var group = document.getElementById('mat-group').value;
+  var subject = document.getElementById('mat-subject').value.trim();
+  var title = document.getElementById('mat-title').value.trim();
+  var url = document.getElementById('mat-url').value.trim();
+  var description = document.getElementById('mat-desc').value.trim();
+  if (!title || !url) { toast('Нужны название и ссылка', true); return; }
+  try { await api('/api/materials', { method:'POST', body: JSON.stringify({ group, subject, title, url, description }) }); toast('Добавлено'); renderMaterials(); }
+  catch(e) { toast(e.message, true); }
+}
+async function deleteMaterial(id) {
+  if (!confirm('Удалить?')) return;
+  try { await api('/api/materials/' + id, { method: 'DELETE' }); renderMaterials(); }
+  catch(e) { toast(e.message, true); }
+}
+
+async function renderOfficeHours() {
+  var me = state.user;
+  main.innerHTML = '';
+  var ohGroup = el('div', { class: 'group' });
+  ohGroup.appendChild(el('div', { class: 'group-header', text: 'Приёмные часы' }));
+  var oh = me.officeHours || [];
+  if (!oh.length) ohGroup.appendChild(el('div', { class: 'empty', text: 'Не указаны' }));
+  else oh.forEach(function(o, idx) {
+    ohGroup.appendChild(el('div', { class: 'row' }, [
+      el('div', { class: 'name' }, [
+        el('div', { style: 'font-weight:600;', text: formatDayName(o.day) + ' · ' + o.start + '–' + o.end }),
+        el('div', { style: 'color:var(--text-secondary); font-size:13px;', text: o.place || '' })
+      ]),
+      el('button', { style: 'background:transparent; border:none; color:var(--red); cursor:pointer;', text: '×', onclick: function() { removeOfficeHour(idx); } })
+    ]));
+  });
+  var addForm = el('div', { style: 'padding: 12px 20px; border-top: 1px solid var(--separator);' });
+  addForm.appendChild(el('div', { style: 'display:flex; gap:8px; flex-wrap:wrap;' }, [
+    el('select', { id: 'oh-day', style: 'padding:8px 12px; border:none; background:var(--gray-bg); border-radius:10px; font-family:inherit; font-size:14px;' }, [
+      el('option', { value: 'mon', text: 'Пн' }), el('option', { value: 'tue', text: 'Вт' }), el('option', { value: 'wed', text: 'Ср' }), el('option', { value: 'thu', text: 'Чт' }), el('option', { value: 'fri', text: 'Пт' })
+    ]),
+    el('input', { id: 'oh-start', type: 'time', value: '14:00', style: 'padding:8px 12px; border:none; background:var(--gray-bg); border-radius:10px; font-family:inherit; font-size:14px;' }),
+    el('input', { id: 'oh-end', type: 'time', value: '16:00', style: 'padding:8px 12px; border:none; background:var(--gray-bg); border-radius:10px; font-family:inherit; font-size:14px;' }),
+    el('input', { id: 'oh-place', type: 'text', placeholder: '9-431', style: 'flex:1; min-width:80px; padding:8px 12px; border:none; background:var(--gray-bg); border-radius:10px; font-family:inherit; font-size:14px;' }),
+    el('button', { class: 'btn', style: 'padding:8px 16px; font-size:13px;', text: '+', onclick: addOfficeHour })
+  ]));
+  ohGroup.appendChild(addForm);
+  main.appendChild(ohGroup);
+}
+async function addOfficeHour() {
+  var day = document.getElementById('oh-day').value;
+  var start = document.getElementById('oh-start').value;
+  var end = document.getElementById('oh-end').value;
+  var place = document.getElementById('oh-place').value.trim();
+  if (!start || !end) { toast('Заполните время', true); return; }
+  var updated = (state.user.officeHours || []).concat([{ day, start, end, place }]);
+  try { await api('/api/teachers/me/office-hours', { method:'PATCH', body: JSON.stringify({ officeHours: updated }) }); state.user = await api('/api/me'); renderOfficeHours(); }
+  catch(e) { toast(e.message, true); }
+}
+async function removeOfficeHour(idx) {
+  var updated = (state.user.officeHours || []).filter(function(_, i) { return i !== idx; });
+  try { await api('/api/teachers/me/office-hours', { method:'PATCH', body: JSON.stringify({ officeHours: updated }) }); state.user = await api('/api/me'); renderOfficeHours(); }
+  catch(e) { toast(e.message, true); }
+}
+
+async function renderProfileSelf() {
+  var me = state.user;
+  main.innerHTML = '';
+  var hero = el('div', { class: 'group' }, [el('div', { class: 'profile-hero' }, [
+    avatarNode(me, 'lg'),
+    el('h2', { text: me.fullName }),
+    el('div', { class: 'role', text: roleLabel(me.role) }),
+    me.group ? el('div', { class: 'badges' }, [el('div', { class: 'pill', text: me.group })]) : null
+  ])]);
+  main.appendChild(hero);
+  var form = el('div', { class: 'group' });
+  form.appendChild(el('div', { class: 'group-header', text: 'Основное' }));
+  form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'Фото URL' }), el('input', { id: 'me-photo', type: 'text', value: me.photoUrl || '', placeholder: 'https://...' })]));
+  form.appendChild(el('div', { class: 'form-group' }, [el('label', { text: 'О себе' }), el('textarea', { id: 'me-bio', placeholder: 'Пара слов' }, [me.bio || ''])]));
+  form.appendChild(el('div', { class: 'form-actions' }, [el('button', { class: 'btn', text: 'Сохранить', onclick: saveProfile })]));
+  main.appendChild(form);
+  // Кнопка "Моя зачётка" — только для студента и старосты
+  if (me.role === 'student' || me.role === 'starosta') {
+    var gbBtn = el('div', { class: 'group' });
+    gbBtn.appendChild(el('div', { class: 'group-header', text: 'Зачётная книжка' }));
+    gbBtn.appendChild(el('div', { class: 'row clickable', onclick: function() { openGradebook(me.id); } }, [
+      el('div', { class: 'avatar', style: 'background: var(--indigo); width: 42px; height: 42px; border-radius: 12px;', text: '📚' }),
+      el('div', { style: 'flex: 1;' }, [
+        el('div', { style: 'font-weight:600; font-size:15px;', text: 'Моя зачётка' }),
+        el('div', { style: 'color:var(--text-secondary); font-size:13px; margin-top:2px;', text: 'Оценки, экзамены, практика' })
+      ]),
+      el('div', { class: 'chevron', text: '›' })
+    ]));
+    main.appendChild(gbBtn);
+  }
+  await renderSocialsSection();
+}
+async function renderSocialsSection() {
+  var socials = state.user.socials || [];
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header' }, ['Соцсети и контакты', el('span', { class: 'badge badge-editable', text: String(socials.length) })]));
+  if (!socials.length) {
+    group.appendChild(el('div', { style: 'padding: 24px 20px; text-align: center;' }, [
+      el('div', { style: 'font-size: 40px; margin-bottom: 8px;', text: '🔗' }),
+      el('div', { style: 'font-size: 14px; color: var(--text-secondary);', text: 'Пока ничего не добавлено' })
+    ]));
+  } else {
+    socials.forEach(function(s) {
+      var meta = SOCIAL_META[s.type] || { icon: '🔗', color: '#007aff', label: s.type };
+      var visLabel = { all: '🌍', staff: '🔒', private: '🕵' }[s.visible] || '';
+      group.appendChild(el('div', { class: 'social-row' }, [
+        el('div', { class: 'social-icon', style: 'background: ' + meta.color + '20;', text: meta.icon }),
+        el('div', { class: 'social-info' }, [
+          el('div', { class: 'social-label', text: (s.label || meta.label) + ' ' + visLabel }),
+          el('div', { class: 'social-value', text: s.value })
+        ]),
+        el('div', { class: 'social-actions' }, [
+          el('button', { class: 'social-btn', title: 'Изменить', text: '✏️', onclick: function() { editSocialDialog(s); } }),
+          el('button', { class: 'social-btn danger', title: 'Удалить', text: '✕', onclick: function() { deleteSocialConfirm(s.id); } })
+        ])
+      ]));
+    });
+  }
+  group.appendChild(el('div', { style: 'padding: 12px 20px 16px;' }, [el('button', { class: 'btn', style: 'width: 100%;', text: '+ Добавить соцсеть', onclick: openAddSocialDialog })]));
+  main.appendChild(group);
+}
+async function openAddSocialDialog() {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '';
+  pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Добавить соцсеть' }), el('p', { text: 'Выберите из списка' })]));
+  var list = el('div');
+  Object.keys(SOCIAL_META).forEach(function(key) {
+    var meta = SOCIAL_META[key];
+    var item = el('div', { class: 'popover-item' }, [
+      el('div', { class: 'social-icon sm', style: 'background: ' + meta.color + '20;', text: meta.icon }),
+      el('div', { class: 'label', text: meta.label })
+    ]);
+    item.addEventListener('click', function() { overlay.remove(); showSocialFormDialog(key); });
+    list.appendChild(item);
+  });
+  pop.appendChild(list);
+}
+function showSocialFormDialog(type, existingSocial) {
+  var meta = SOCIAL_META[type] || { label: type, icon: '🔗', color: '#007aff' };
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '';
+  pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: (existingSocial ? 'Изменить ' : 'Добавить ') + meta.label }), el('p', { text: type === 'custom' ? 'Укажите название и ссылку' : 'Вставьте ссылку или @username' })]));
+  var form = el('div', { style: 'padding: 12px 16px 4px;' });
+  var customLabelInput = null;
+  if (type === 'custom') {
+    customLabelInput = el('input', { type: 'text', placeholder: 'Название', value: existingSocial?.label || '', style: 'width: 100%; padding: 12px 14px; border: 1px solid var(--glass-border-light); background: var(--gray-bg); border-radius: 12px; font-family: inherit; font-size: 15px; color: var(--text); margin-bottom: 8px;' });
+    form.appendChild(customLabelInput);
+  }
+  var valueInput = el('input', { type: 'text', placeholder: getPlaceholder(type), value: existingSocial?.value || '', style: 'width: 100%; padding: 12px 14px; border: 1px solid var(--glass-border-light); background: var(--gray-bg); border-radius: 12px; font-family: inherit; font-size: 15px; color: var(--text);' });
+  form.appendChild(valueInput);
+  pop.appendChild(form);
+  var visibleRow = el('div', { style: 'padding: 12px 16px 4px;' });
+  visibleRow.appendChild(el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;', text: 'Кто видит' }));
+  var currentVisible = existingSocial?.visible || (meta.defaultVisible || 'all');
+  var visibleOptions = [
+    { key: 'all', label: '🌍 Все' },
+    { key: 'staff', label: '🔒 Старосты и преподаватели' },
+    { key: 'private', label: '🕵 Только я' }
+  ];
+  visibleOptions.forEach(function(v) {
+    var isActive = currentVisible === v.key;
+    var opt = el('div', { class: 'popover-item' }, [
+      el('div', { class: 'label' }, [el('div', { style: 'font-size: 14px; font-weight: 500;', text: v.label })]),
+      isActive ? el('div', { class: 'check', text: '✓' }) : null
+    ]);
+    opt.addEventListener('click', function() {
+      currentVisible = v.key;
+      visibleRow.querySelectorAll('.popover-item').forEach(function(n) {
+        var c = n.querySelector('.check'); if (c) c.remove();
+        if (n === opt) n.appendChild(el('div', { class: 'check', text: '✓' }));
+      });
+    });
+    visibleRow.appendChild(opt);
+  });
+  pop.appendChild(visibleRow);
+  var actions = el('div', { style: 'padding: 14px 16px; display: flex; gap: 8px;' });
+  actions.appendChild(el('button', {
+    class: 'btn', text: existingSocial ? 'Сохранить' : 'Добавить', style: 'flex: 1;',
+    onclick: async function() {
+      var value = valueInput.value.trim();
+      if (!value) { toast('Введите значение', true); return; }
+      var customLabel = customLabelInput ? customLabelInput.value.trim() : null;
+      if (type === 'custom' && !customLabel) { toast('Введите название', true); return; }
+      try {
+        if (existingSocial) {
+          state.user = await api('/api/me/socials/' + existingSocial.id, { method:'PATCH', body: JSON.stringify({ value, visible: currentVisible, customLabel }) });
+          toast('Обновлено');
+        } else {
+          state.user = await api('/api/me/socials', { method:'POST', body: JSON.stringify({ type, value, visible: currentVisible, customLabel }) });
+          toast('Добавлено');
+        }
+        overlay.remove();
+        renderProfileSelf();
+      } catch(e) { toast(e.message, true); }
+    }
+  }));
+  actions.appendChild(el('button', { class: 'btn btn-secondary', text: 'Отмена', onclick: function() { overlay.remove(); } }));
+  pop.appendChild(actions);
+  setTimeout(function() { valueInput.focus(); }, 100);
+}
+function getPlaceholder(type) {
+  var map = { phone: '+7 (999) 123-45-67', email: 'user@example.com', telegram: '@username', whatsapp: '+7 999 123-45-67', vk: 'https://vk.com/...', ok: 'https://ok.ru/...', rutube: 'https://rutube.ru/...', dzen: 'https://dzen.ru/...', github: 'https://github.com/...', website: 'https://example.com', custom: 'https://...' };
+  return map[type] || 'Введите значение';
+}
+function editSocialDialog(social) { showSocialFormDialog(social.type, social); }
+async function deleteSocialConfirm(socialId) {
+  if (!confirm('Удалить?')) return;
+  try { state.user = await api('/api/me/socials/' + socialId, { method: 'DELETE' }); toast('Удалено'); renderProfileSelf(); }
+  catch(e) { toast(e.message, true); }
+}
+async function saveProfile() {
+  var bio = document.getElementById('me-bio').value.trim();
+  var photoUrl = document.getElementById('me-photo').value.trim();
+  try { state.user = await api('/api/me', { method:'PATCH', body: JSON.stringify({ bio, photoUrl }) }); toast('Сохранено'); renderProfileSelf(); }
+  catch(e) { toast(e.message, true); }
+}
+
+async function openUserProfile(userId) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.style.minWidth = '340px';
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var user = await api('/api/users/' + userId);
+    var stats = { total: 0 };
+    try { stats = await api('/api/users/' + userId + '/stats'); } catch(e) {}
+    var officeHours = [], consultations = [];
+    if (user.role === 'teacher') {
+      try { officeHours = await api('/api/teachers/' + userId + '/office-hours'); } catch(e) {}
+      try { consultations = await api('/api/teachers/' + userId + '/consultations'); } catch(e) {}
+    }
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'profile-hero', style: 'padding: 24px 20px 16px;' }, [
+      avatarNode(user, 'lg'),
+      el('h2', { text: user.fullName, style: 'font-size: 20px; margin-top: 12px;' }),
+      el('div', { class: 'role', text: roleLabel(user.role) }),
+      user.group ? el('div', { class: 'badges' }, [el('div', { class: 'pill', text: user.group })]) : null
+    ]));
+    if (user.role === 'student' || user.role === 'starosta') {
+      pop.appendChild(el('div', { style: 'padding: 0 20px 12px;' }, [
+        el('button', { class: 'btn', style: 'width: 100%; background: var(--indigo);', text: '📚 Открыть зачётку', onclick: function() { overlay.remove(); openGradebook(userId); } })
+      ]));
+    }
+    var socials = user.socials || [];
+    if (socials.length) {
+      var socWrap = el('div', { style: 'padding: 0 20px 12px;' });
+      socials.forEach(function(s) {
+        var meta = SOCIAL_META[s.type] || { icon: '🔗', color: '#007aff', label: s.type };
+        var row = el('div', { class: 'social-row-compact' }, [
+          el('div', { class: 'social-icon sm', style: 'background: ' + meta.color + '20;', text: meta.icon }),
+          el('div', { class: 'social-info' }, [el('div', { class: 'social-label', text: s.label || meta.label }), el('div', { class: 'social-value', text: s.value })])
+        ]);
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function() { if (navigator.clipboard) navigator.clipboard.writeText(s.value).then(function() { toast('Скопировано'); }); });
+        socWrap.appendChild(row);
+      });
+      pop.appendChild(socWrap);
+    }
+    var contactRows = [];
+    if (user.email) contactRows.push(['Email', user.email]);
+    if (user.birthday) contactRows.push(['ДР', formatDate(user.birthday)]);
+    if (contactRows.length) {
+      var cg = el('div', { style: 'padding: 0 20px 12px;' });
+      contactRows.forEach(function(r) {
+        cg.appendChild(el('div', { style: 'display:flex; justify-content:space-between; padding: 6px 0; font-size: 14px;' }, [
+          el('span', { style: 'color:var(--text-secondary);', text: r[0] }),
+          el('span', { text: r[1], style: 'font-weight:500;' })
+        ]));
+      });
+      pop.appendChild(cg);
+    }
+    if (user.role !== 'teacher' && stats.total > 0) {
+      pop.appendChild(el('div', { style: 'padding: 8px 20px 12px; border-top: 1px solid var(--separator);' }, [
+        el('div', { style: 'font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;', text: 'Посещаемость' }),
+        el('div', { class: 'stats-grid', style: 'padding: 0;' }, [
+          el('div', { class: 'stat-cell red' }, [el('div', { class: 'num', text: String(stats.absent) }), el('div', { class: 'lbl', text: 'не был' })]),
+          el('div', { class: 'stat-cell indigo' }, [el('div', { class: 'num', text: String(stats.excused) }), el('div', { class: 'lbl', text: 'уваж.' })]),
+          el('div', { class: 'stat-cell orange' }, [el('div', { class: 'num', text: String(stats.drone) }), el('div', { class: 'lbl', text: 'БПЛА' })])
+        ])
+      ]));
+      pop.appendChild(el('div', { style: 'padding: 0 20px 16px;' }, [
+        el('button', { class: 'btn btn-secondary', style: 'width: 100%;', text: '📊 Полная статистика', onclick: function() { overlay.remove(); openFullStats(userId); } })
+      ]));
+    }
+  } catch(e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+
+async function openGradebook(userId) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.style.minWidth = '380px';
+  pop.style.maxWidth = '500px';
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+  try {
+    var gb = await api('/api/users/' + userId + '/gradebook');
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Электронная зачётная книжка' }), el('p', { text: gb.fullName })]));
+    if (gb.empty) { pop.appendChild(el('div', { class: 'empty', text: 'Зачётка пуста' })); return; }
+    if (gb.specialty) {
+      var specWrap = el('div', { class: 'gb-spec' });
+      specWrap.appendChild(el('div', { class: 'gb-spec-code', text: gb.specialty.code }));
+      specWrap.appendChild(el('div', { class: 'gb-spec-name', text: gb.specialty.name }));
+      specWrap.appendChild(el('div', { class: 'gb-spec-row' }, [el('span', { class: 'gb-spec-lbl', text: 'Уровень' }), el('span', { class: 'gb-spec-val', text: gb.specialty.level })]));
+      specWrap.appendChild(el('div', { class: 'gb-spec-row' }, [el('span', { class: 'gb-spec-lbl', text: 'Форма' }), el('span', { class: 'gb-spec-val', text: gb.specialty.form })]));
+      pop.appendChild(specWrap);
+    }
+    var metaWrap = el('div', { class: 'gb-meta' });
+    [
+      ['Год поступления', gb.enrollmentYear],
+      ['Сейчас', gb.currentYear ? gb.currentYear + ' курс' : '—'],
+      ['Семестр', gb.currentSemester ? gb.currentSemester + ' семестр' : '—'],
+      ['Срок обучения', gb.studyDuration ? gb.studyDuration + ' лет' : '—']
+    ].forEach(function(row) {
+      metaWrap.appendChild(el('div', { class: 'gb-meta-row' }, [el('span', { class: 'gb-meta-lbl', text: row[0] }), el('span', { class: 'gb-meta-val', text: String(row[1] || '—') })]));
+    });
+    pop.appendChild(metaWrap);
+        // Средний балл
+    var avgData = await api('/api/users/' + userId + '/gradebook-average');
+    if (avgData.average !== null) {
+      var avgWrap = el('div', { class: 'gb-meta', style: 'text-align:center; padding: 20px; margin: 8px 8px 0;' }, [
+        el('div', { style: 'font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;', text: 'Средний балл' }),
+        el('div', { style: 'font-size: 42px; font-weight: 800; letter-spacing: -0.04em; color: var(--accent); margin-top: 4px;', text: avgData.average }),
+        el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: 'по ' + avgData.count + ' предметам' })
+      ]);
+      pop.appendChild(avgWrap);
+    }
+    (gb.semesters || []).forEach(function(sem) {
+      var semWrap = el('div', { class: 'gb-semester' });
+      semWrap.appendChild(el('div', { class: 'gb-semester-title', text: sem.label }));
+      if (sem.exams && sem.exams.length) {
+        semWrap.appendChild(el('div', { class: 'gb-section-title', text: 'Экзамены' }));
+        sem.exams.forEach(function(e) { semWrap.appendChild(buildGradebookRow(e, 'exam')); });
+      }
+      if (sem.credits && sem.credits.length) {
+        semWrap.appendChild(el('div', { class: 'gb-section-title', text: 'Зачёты и диф. зачёты' }));
+        sem.credits.forEach(function(c) { semWrap.appendChild(buildGradebookRow(c, 'credit')); });
+      }
+      if (sem.practice && sem.practice.length) {
+        semWrap.appendChild(el('div', { class: 'gb-section-title', text: 'Практика' }));
+        sem.practice.forEach(function(p) { semWrap.appendChild(buildGradebookRow(p, 'practice')); });
+      }
+      pop.appendChild(semWrap);
+    });
+  } catch(e) { pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>'; }
+}
+function buildGradebookRow(item, kind) {
+  var row = el('div', { class: 'gb-row' });
+  var left = el('div', { class: 'gb-row-left' });
+  left.appendChild(el('div', { class: 'gb-row-subject', text: item.subject || item.name || '—' }));
+  var meta = [];
+  if (kind === 'practice' && item.type) meta.push(item.type);
+  if (item.teacher) meta.push(item.teacher);
+  if (item.hours) meta.push(item.hours + ' ч.');
+  if (meta.length) left.appendChild(el('div', { class: 'gb-row-meta', text: meta.join(' · ') }));
+  if (item.date) left.appendChild(el('div', { class: 'gb-row-date', text: formatDate(item.date) }));
+  row.appendChild(left);
+  var gradeText = item.grade || '—';
+  var gradeClass = 'gb-grade';
+  if (gradeText === 'отлично' || gradeText === '5') gradeClass += ' grade-5';
+  else if (gradeText === 'хорошо' || gradeText === '4') gradeClass += ' grade-4';
+  else if (gradeText === 'удовлетворительно' || gradeText === '3') gradeClass += ' grade-3';
+  else if (gradeText === 'неудовлетворительно' || gradeText === '2') gradeClass += ' grade-2';
+  else if (gradeText === 'зачтено') gradeClass += ' grade-pass';
+  else if (gradeText === 'не зачтено') gradeClass += ' grade-fail';
+  row.appendChild(el('div', { class: gradeClass, text: gradeText }));
+  return row;
+}
+
+// ============================================================
+//  КУРАТОР: ЖУРНАЛЫ
+// ============================================================
+async function renderCuratorJournals() {
+  main.innerHTML = '';
+  var journals = await api('/api/curator/journals');
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Все журналы',
+    el('span', { class: 'badge badge-editable', text: journals.length + ' шт.' })
+  ]));
+  main.appendChild(head);
+
+  if (!journals.length) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'Журналов пока нет' })
+    ]));
+    return;
+  }
+
+  // Группируем по группам
+  var byGroup = {};
+  journals.forEach(function(j) {
+    if (!byGroup[j.group]) byGroup[j.group] = [];
+    byGroup[j.group].push(j);
+  });
+
+  Object.keys(byGroup).sort().forEach(function(groupCode) {
+    var groupBlock = el('div', { class: 'group' });
+    groupBlock.appendChild(el('div', { class: 'group-header' }, [groupCode]));
+
+    byGroup[groupCode].forEach(function(j) {
+      var row = el('div', { class: 'row clickable', onclick: function() {
+        openCuratorJournalDetail(j.group, j.subject);
+      }}, [
+        el('div', { style: 'flex:1; min-width: 0;' }, [
+          el('div', { style: 'font-weight:600; font-size: 15px;', text: j.subject }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: j.teacherName + ' · семестр ' + j.semester })
+        ]),
+        el('div', { style: 'display:flex; flex-direction:column; align-items:flex-end; gap: 4px;' }, [
+          el('span', { style: 'font-size: 12px; color: var(--red); font-weight: 600;', text: j.nCount + ' Н' }),
+          j.avgGrade ? el('span', { style: 'font-size: 12px; color: var(--accent); font-weight: 600;', text: 'ср. ' + j.avgGrade }) : null
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]);
+      groupBlock.appendChild(row);
+    });
+
+    main.appendChild(groupBlock);
+  });
+}
+
+async function openCuratorJournalDetail(groupCode, subject) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.style.minWidth = '90vw';
+  pop.style.maxWidth = '900px';
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+
+  try {
+    var data = await api('/api/curator/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject));
+
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [
+      el('h3', { text: subject }),
+      el('p', { text: groupCode + ' · семестр ' + data.semester })
+    ]));
+
+    if (!data.dates.length) {
+      pop.appendChild(el('div', { class: 'empty', text: 'Отметок пока нет' }));
+      return;
+    }
+
+    var wrapper = el('div', { class: 'journal-wrapper' });
+    var theadRow = el('tr', {});
+    theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
+    data.dates.forEach(function(d) {
+      theadRow.appendChild(el('th', { class: 'date-cell' }, [
+        el('div', { class: 'weekday', text: d.slice(8, 10) + '.' + d.slice(5, 7) })
+      ]));
+    });
+
+    var tbody = el('tbody', {});
+    data.students.forEach(function(s) {
+      var tr = el('tr', {});
+      var colorMap = { none: 'var(--text)', yellow: '#ffcc00', orange: 'var(--orange)', red: 'var(--red)' };
+      var nameColor = colorMap[s.colorLevel] || 'var(--text)';
+
+      var nameCell = el('td', { class: 'name-col' });
+      if (s.individualPlan) {
+        nameCell.appendChild(el('span', { style: 'color: var(--accent); font-weight:700; margin-right: 6px;', text: '★' }));
+      }
+      nameCell.appendChild(el('span', { style: 'color: ' + nameColor + '; font-weight: 600;', text: s.fullName }));
+      tr.appendChild(nameCell);
+
+      data.dates.forEach(function(d) {
+        var mark = s.marks[d] || '';
+        var td = el('td', { class: 'att-cell readonly' });
+        if (mark) {
+          var cls = mark === 'Н' ? 'absent' : (mark === 'С' ? 'drone' : 'grade-' + mark);
+          td.appendChild(el('span', { class: 'status-badge ' + cls, text: mark }));
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    wrapper.appendChild(el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]));
+    pop.appendChild(wrapper);
+
+  } catch (e) {
+    pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+// ============================================================
+//  КУРАТОР: СТУДЕНТЫ
+// ============================================================
+async function renderCuratorStudents() {
+  main.innerHTML = '';
+
+  var { users } = { users: [] };
+  // Получаем список всех студентов через свой эндпоинт
+  var allGroups = await api('/api/all-groups');
+  var allStudents = [];
+
+  for (var i = 0; i < allGroups.length; i++) {
+    try {
+      var list = await api('/api/groups/' + encodeURIComponent(allGroups[i].code) + '/official');
+      list.forEach(function(s) {
+        if (s.userId) allStudents.push({ userId: s.userId, fullName: s.fullName, group: allGroups[i].code, individualPlan: s.individualPlan });
+      });
+    } catch (e) {}
+  }
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Все студенты',
+    el('span', { class: 'badge badge-editable', text: allStudents.length + ' чел.' })
+  ]));
+  main.appendChild(head);
+
+  var list = el('div', { class: 'group' });
+  allStudents.forEach(function(s) {
+    var row = el('div', { class: 'row clickable', onclick: function() {
+      state.curatorStudentId = s.userId;
+      switchTab('curator-student-detail');
+    }}, [
+      el('div', { class: 'idx', text: s.individualPlan ? '★' : '' , style: s.individualPlan ? 'color: var(--accent); font-weight: 700;' : ''}),
+      el('div', { class: 'name', text: s.fullName }),
+      el('div', { class: 'zach', text: s.group }),
+      el('div', { class: 'chevron', text: '›' })
+    ]);
+    list.appendChild(row);
+  });
+  main.appendChild(list);
+}
+
+async function renderCuratorStudentDetail() {
+  main.innerHTML = '';
+  var studentId = state.curatorStudentId;
+  if (!studentId) { switchTab('curator-students'); return; }
+
+  var data = await api('/api/curator/student/' + studentId + '/summary');
+
+  // Hero
+  var hero = el('div', { class: 'hero-card' }, [
+    el('div', { class: 'lbl', text: 'Студент' }),
+    el('div', { class: 'big', html: data.stats.percent + '<span>%</span>', style: 'font-size: 48px;' }),
+    el('div', { class: 'sub', text: data.fullName + ' · ' + data.group + (data.individualPlan ? ' · ⭐ ИП' : '') }),
+    el('div', { class: 'row-stats' }, [
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(data.stats.attended) }), el('div', { class: 'lbl2', text: 'был' })]),
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(data.stats.absent) }), el('div', { class: 'lbl2', text: 'Н' })]),
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: String(data.stats.excused) }), el('div', { class: 'lbl2', text: 'С' })]),
+      el('div', { class: 'stat' }, [el('div', { class: 'num', text: data.stats.avgGrade || '—' }), el('div', { class: 'lbl2', text: 'ср. балл' })])
+    ])
+  ]);
+  main.appendChild(hero);
+
+  // Список предметов
+  var group = el('div', { class: 'group' });
+  group.appendChild(el('div', { class: 'group-header', text: 'Предметы (' + data.subjects.length + ')' }));
+
+  if (!data.subjects.length) {
+    group.appendChild(el('div', { class: 'empty', text: 'Пока нет отметок' }));
+  } else {
+    data.subjects.forEach(function(subj) {
+      var gradesStr = subj.grades.length ? subj.grades.join(', ') : '—';
+      group.appendChild(el('div', { class: 'row' }, [
+        el('div', { style: 'flex: 1; min-width: 0;' }, [
+          el('div', { style: 'font-weight: 600; font-size: 14px;', text: subj.subject }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: 'Оценки: ' + gradesStr })
+        ]),
+        el('div', { style: 'display: flex; gap: 6px; flex-shrink: 0;' }, [
+          subj.n > 0 ? el('span', { style: 'font-size: 11px; padding: 2px 8px; border-radius: 100px; background: rgba(255,59,48,0.15); color: var(--red); font-weight: 700;', text: subj.n + ' Н' }) : null,
+          subj.s > 0 ? el('span', { style: 'font-size: 11px; padding: 2px 8px; border-radius: 100px; background: rgba(255,149,0,0.15); color: var(--orange); font-weight: 700;', text: subj.s + ' С' }) : null
+        ])
+      ]));
+    });
+  }
+  main.appendChild(group);
+
+  var back = el('div', { class: 'group' });
+  back.appendChild(el('div', { class: 'row clickable', onclick: function() { switchTab('curator-students'); } }, [
+    el('div', { class: 'name', style: 'color: var(--accent); text-align: center; width: 100%;', text: '← К списку студентов' })
+  ]));
+  main.appendChild(back);
+}
+
+async function renderSettings() {
+  main.innerHTML = '';
+  var currentTheme = localStorage.getItem('theme') || 'system';
+  var langGroup = el('div', { class: 'group' });
+  langGroup.appendChild(el('div', { class: 'group-header', text: t('language') }));
+  [
+    { key: 'ru', label: '🇷🇺 Русский' },
+    { key: 'en', label: '🇬🇧 English' },
+    { key: 'de', label: '🇩🇪 Deutsch' }
+  ].forEach(function(l) {
+    var isActive = LANG === l.key;
+    var item = el('div', { class: 'row clickable', onclick: function() { localStorage.setItem('lang', l.key); location.reload(); }}, [
+      el('div', { class: 'name', text: l.label }),
+      isActive ? el('div', { style: 'color:var(--accent); font-weight:700;', text: '✓' }) : null
+    ]);
+    langGroup.appendChild(item);
+  });
+  main.appendChild(langGroup);
+  var appearance = el('div', { class: 'group' });
+  appearance.appendChild(el('div', { class: 'group-header', text: 'Оформление' }));
+  [
+    { key: 'system', label: 'Как в системе', icon: '⚙️' },
+    { key: 'light', label: 'Светлая', icon: '☀️' },
+    { key: 'dark', label: 'Тёмная', icon: '🌙' }
+  ].forEach(function(th) {
+    var isActive = currentTheme === th.key;
+    var item = el('div', { class: 'row clickable' }, [
+      el('div', { class: 'idx', style: 'background: transparent; font-size: 18px;', text: th.icon }),
+      el('div', { class: 'name', text: th.label }),
+      isActive ? el('div', { style: 'color: var(--accent); font-weight:700;', text: '✓' }) : null
+    ]);
+    item.addEventListener('click', function() { localStorage.setItem('theme', th.key); applyTheme(th.key); renderSettings(); });
+    appearance.appendChild(item);
+  });
+  main.appendChild(appearance);
+  if (state.user.role === 'student' || state.user.role === 'starosta') {
+    var pg = el('div', { class: 'group' });
+    pg.appendChild(el('div', { class: 'group-header', text: 'Профиль' }));
+    pg.appendChild(el('div', { class: 'row clickable', onclick: function() { renderProfileSelfIntoMain(); } }, [
+      avatarNode(state.user, 'sm'),
+      el('div', { class: 'name', text: 'Мой профиль' }),
+      el('div', { class: 'chevron', text: '›' })
+    ]));
+    main.appendChild(pg);
+  }
+  var about = el('div', { class: 'group' });
+  about.appendChild(el('div', { class: 'group-header', text: 'О приложении' }));
+  about.appendChild(el('div', { class: 'row' }, [el('div', { class: 'name', text: 'Версия' }), el('div', { style: 'color:var(--text-secondary);', text: '1.0.0' })]));
+  about.appendChild(el('div', { class: 'row' }, [el('div', { class: 'name', text: 'Разработчик' }), el('div', { style: 'color:var(--text-secondary);', text: 'СКФУ' })]));
+  main.appendChild(about);
+  var lg = el('div', { class: 'group' });
+  var lr = el('div', { class: 'row clickable' }, [el('div', { class: 'name', style: 'color: var(--red); text-align:center; width:100%;', text: 'Выйти из аккаунта' })]);
+  lr.addEventListener('click', logout);
+  lg.appendChild(lr);
+  main.appendChild(lg);
+}
+function renderProfileSelfIntoMain() {
+  state.currentTab = 'profile';
+  document.getElementById('page-title-text').textContent = 'Профиль';
+  document.getElementById('page-subtitle').textContent = 'Мои данные';
+  renderProfileSelf();
+}
+function applyTheme(theme) {
+  var root = document.documentElement;
+  var isDark = false;
+  if (theme === 'system') {
+    root.removeAttribute('data-theme');
+    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (isDark) root.setAttribute('data-theme', 'dark');
+  } else {
+    root.setAttribute('data-theme', theme);
+    isDark = theme === 'dark';
+  }
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  var stored = localStorage.getItem('theme') || 'system';
+  if (stored === 'system') applyTheme('system');
+});
+
+async function enterApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+  document.getElementById('me-group').textContent = state.user.group || (state.user.role === 'teacher' ? 'Преподаватель' : '');
+  buildTabBar();
+  var tabs = getTabs();
+  switchTab(tabs[0].key);
+}
+
+document.getElementById('login-btn').addEventListener('click', function() {
+  var login = document.getElementById('login-input').value.trim();
+  var password = document.getElementById('password-input').value;
+  if (!login || !password) { toast('Введите логин и пароль', true); return; }
+  tryLogin(login, password);
+});
+document.getElementById('password-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
+document.getElementById('logout-btn').addEventListener('click', logout);
+window.addEventListener('scroll', function() { document.body.classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
+applyTheme(localStorage.getItem('theme') || 'system');
+(async function init() {
+  var ok = await checkAuth();
+  if (ok) await enterApp();
+})();
+</script>
+
+</body>
+</html>
