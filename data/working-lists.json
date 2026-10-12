@@ -2,260 +2,51 @@
   "КМБ-с-о-25-1": {
     "starostaId": "u11",
     "students": [
-      {
-        "id": "s1",
-        "userId": "u1",
-        "fullName": "Бабицкий Николай",
-        "zachetka": "25-0001",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s2",
-        "userId": "u3",
-        "fullName": "Боршакаев Эмиль",
-        "zachetka": "25-0002",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s3",
-        "userId": "u4",
-        "fullName": "Буянов Владимир",
-        "zachetka": "25-0003",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s4",
-        "userId": "u5",
-        "fullName": "Верещака Владислав",
-        "zachetka": "25-0004",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s5",
-        "userId": "u6",
-        "fullName": "Водопьянов Кирилл",
-        "zachetka": "25-0005",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s6",
-        "userId": "u7",
-        "fullName": "Войку Лев",
-        "zachetka": "25-0006",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s7",
-        "userId": "u8",
-        "fullName": "Габоев Тамерлан",
-        "zachetka": "25-0007",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s8",
-        "userId": "u9",
-        "fullName": "Гусаков Роман",
-        "zachetka": "25-0008",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s9",
-        "userId": "u10",
-        "fullName": "Гусейнов Фирдовси",
-        "zachetka": "25-0009",
-        "notes": "",
-        "attendance": {
-          "2026-10-10": "drone"
-        },
-        "grades": {}
-      },
-      {
-        "id": "s10",
-        "userId": "u11",
-        "fullName": "Джангуразов Темирлан",
-        "zachetka": "25-0010",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s11",
-        "userId": "u12",
-        "fullName": "Дьяченко Лаура",
-        "zachetka": "25-0011",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s12",
-        "userId": "u13",
-        "fullName": "Егер Станислав",
-        "zachetka": "25-0012",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s13",
-        "userId": "u14",
-        "fullName": "Забаровский Тимофей",
-        "zachetka": "25-0013",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s14",
-        "userId": "u15",
-        "fullName": "Заяц Артем",
-        "zachetka": "25-0014",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s15",
-        "userId": "u16",
-        "fullName": "Летницкий Альберт",
-        "zachetka": "25-0015",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s16",
-        "userId": "u17",
-        "fullName": "Макаренко Андрей",
-        "zachetka": "25-0016",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s17",
-        "userId": "u18",
-        "fullName": "Меремкулова Дарина",
-        "zachetka": "25-0017",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s18",
-        "userId": "u19",
-        "fullName": "Мясоедова Виктория",
-        "zachetka": "25-0018",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s19",
-        "userId": "u20",
-        "fullName": "Охов Азамат",
-        "zachetka": "25-0019",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s20",
-        "userId": "u21",
-        "fullName": "Пармон Ростислав",
-        "zachetka": "25-0020",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s21",
-        "userId": "u22",
-        "fullName": "Почекаев Илья",
-        "zachetka": "25-0021",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s22",
-        "userId": "u23",
-        "fullName": "Просветова Мария",
-        "zachetka": "25-0022",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s23",
-        "userId": "u24",
-        "fullName": "Романенко Александра",
-        "zachetka": "25-0023",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s24",
-        "userId": "u25",
-        "fullName": "Савельев Дмитрий",
-        "zachetka": "25-0024",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s25",
-        "userId": "u26",
-        "fullName": "Тамбиев Тимурлан",
-        "zachetka": "25-0025",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s26",
-        "userId": "u27",
-        "fullName": "Хакин Евгений",
-        "zachetka": "25-0026",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s27",
-        "userId": "u28",
-        "fullName": "Хачатрян Эрик",
-        "zachetka": "25-0027",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      },
-      {
-        "id": "s28",
-        "userId": "u29",
-        "fullName": "Чуринова Валерия",
-        "zachetka": "25-0028",
-        "notes": "",
-        "attendance": {},
-        "grades": {}
-      }
+      { "id": "s1",  "fullName": "Бабицкий Николай",       "zachetka": "25-0001", "userId": "u1s",  "notes": "", "attendance": {} },
+      { "id": "s2",  "fullName": "Боршакаев Эмиль",        "zachetka": "25-0002", "userId": "u3s",  "notes": "", "attendance": {} },
+      { "id": "s3",  "fullName": "Буянов Владимир",        "zachetka": "25-0003", "userId": "u4",   "notes": "", "attendance": {} },
+      { "id": "s4",  "fullName": "Верещака Владислав",     "zachetka": "25-0004", "userId": "u5",   "notes": "", "attendance": {} },
+      { "id": "s5",  "fullName": "Водопьянов Кирилл",      "zachetka": "25-0005", "userId": "u6",   "notes": "", "attendance": {} },
+      { "id": "s6",  "fullName": "Войку Лев",              "zachetka": "25-0006", "userId": "u7",   "notes": "", "attendance": {} },
+      { "id": "s7",  "fullName": "Габоев Тамерлан",        "zachetka": "25-0007", "userId": "u8",   "notes": "", "attendance": {} },
+      { "id": "s8",  "fullName": "Гусаков Роман",          "zachetka": "25-0008", "userId": "u9",   "notes": "", "attendance": {} },
+      { "id": "s9",  "fullName": "Гусейнов Фирдовси",      "zachetka": "25-0009", "userId": "u10",  "notes": "", "attendance": {} },
+      { "id": "s10", "fullName": "Джангуразов Темирлан",   "zachetka": "25-0010", "userId": "u11",  "notes": "", "attendance": {} },
+      { "id": "s11", "fullName": "Дьяченко Лаура",         "zachetka": "25-0011", "userId": "u12",  "notes": "", "attendance": {} },
+      { "id": "s12", "fullName": "Егер Станислав",         "zachetka": "25-0012", "userId": "u13",  "notes": "", "attendance": {} },
+      { "id": "s13", "fullName": "Забаровский Тимофей",    "zachetka": "25-0013", "userId": "u14",  "notes": "", "attendance": {} },
+      { "id": "s14", "fullName": "Заяц Артем",             "zachetka": "25-0014", "userId": "u15",  "notes": "", "attendance": {} },
+      { "id": "s15", "fullName": "Летницкий Альберт",      "zachetka": "25-0015", "userId": "u16",  "notes": "", "attendance": {} },
+      { "id": "s16", "fullName": "Макаренко Андрей",       "zachetka": "25-0016", "userId": "u17",  "notes": "", "attendance": {} },
+      { "id": "s17", "fullName": "Меремкулова Дарина",     "zachetka": "25-0017", "userId": "u18",  "notes": "", "attendance": {} },
+      { "id": "s18", "fullName": "Мясоедова Виктория",     "zachetka": "25-0018", "userId": "u19",  "notes": "", "attendance": {} },
+      { "id": "s19", "fullName": "Охов Азамат",            "zachetka": "25-0019", "userId": "u20sc","notes": "", "attendance": {} },
+      { "id": "s20", "fullName": "Пармон Ростислав",       "zachetka": "25-0020", "userId": "u21s", "notes": "", "attendance": {} },
+      { "id": "s21", "fullName": "Почекаев Илья",          "zachetka": "25-0021", "userId": "u22s", "notes": "", "attendance": {} },
+      { "id": "s22", "fullName": "Просветова Мария",       "zachetka": "25-0022", "userId": "u23s", "notes": "", "attendance": {} },
+      { "id": "s23", "fullName": "Романенко Александра",   "zachetka": "25-0023", "userId": "u24s", "notes": "", "attendance": {} },
+      { "id": "s24", "fullName": "Савельев Дмитрий",       "zachetka": "25-0024", "userId": "u25s", "notes": "", "attendance": {} },
+      { "id": "s25", "fullName": "Тамбиев Тимурлан",       "zachetka": "25-0025", "userId": "u26s", "notes": "", "attendance": {} },
+      { "id": "s26", "fullName": "Хакин Евгений",          "zachetka": "25-0026", "userId": "u27s", "notes": "", "attendance": {} },
+      { "id": "s27", "fullName": "Хачатрян Эрик",          "zachetka": "25-0027", "userId": "u28s", "notes": "", "attendance": {} },
+      { "id": "s28", "fullName": "Чуринова Валерия",       "zachetka": "25-0028", "userId": "u29s", "notes": "", "attendance": {} }
+    ]
+  },
+  "ПМИ-б-о-23-1": {
+    "starostaId": null,
+    "students": [
+      { "id": "s101", "fullName": "Алексеев Иван Петрович",        "zachetka": "23-0101", "userId": "u101", "notes": "", "attendance": {} },
+      { "id": "s102", "fullName": "Борисова Анна Сергеевна",       "zachetka": "23-0102", "userId": "u102", "notes": "", "attendance": {} },
+      { "id": "s103", "fullName": "Васильев Дмитрий Олегович",     "zachetka": "23-0103", "userId": "u103", "notes": "", "attendance": {} },
+      { "id": "s104", "fullName": "Григорьева Мария Ивановна",     "zachetka": "23-0104", "userId": "u104", "notes": "", "attendance": {} },
+      { "id": "s105", "fullName": "Дмитриев Артём Викторович",     "zachetka": "23-0105", "userId": "u105", "notes": "", "attendance": {} },
+      { "id": "s106", "fullName": "Егорова Ольга Андреевна",       "zachetka": "23-0106", "userId": "u106", "notes": "", "attendance": {} },
+      { "id": "s107", "fullName": "Жуков Никита Сергеевич",        "zachetka": "23-0107", "userId": "u107", "notes": "", "attendance": {} },
+      { "id": "s108", "fullName": "Захарова Екатерина Дмитриевна", "zachetka": "23-0108", "userId": "u108", "notes": "", "attendance": {} },
+      { "id": "s109", "fullName": "Иванова Светлана Павловна",     "zachetka": "23-0109", "userId": "u109", "notes": "", "attendance": {} },
+      { "id": "s110", "fullName": "Кузнецов Максим Игоревич",      "zachetka": "23-0110", "userId": "u110", "notes": "", "attendance": {} },
+      { "id": "s111", "fullName": "Лебедева Полина Романовна",     "zachetka": "23-0111", "userId": "u111", "notes": "", "attendance": {} },
+      { "id": "s112", "fullName": "Михайлов Егор Александрович",   "zachetka": "23-0112", "userId": "u112", "notes": "", "attendance": {} }
     ]
   }
 }
