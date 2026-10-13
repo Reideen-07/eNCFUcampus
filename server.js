@@ -100,7 +100,7 @@ function requireRole(...roles) {
 function safeUserStaff(u) { const { password, ...rest } = u; return rest; }
 function safeUserFor(viewer, target) {
   const safe = safeUserStaff(target);
-  const isStaff = viewer.role === 'starosta' || viewer.role === 'teacher';
+  const isStaff = viewer.role === 'starosta' || viewer.role === 'teacher' || viewer.role === 'curator';
   safe.socials = (target.socials || []).filter(s => {
     if (s.visible === 'private') return false;
     if (s.visible === 'staff') return isStaff;
@@ -135,7 +135,7 @@ app.patch('/api/me', auth, async (req, res) => {
   if (idx < 0) return res.status(404).json({ error: 'Не найден' });
   if (bio !== undefined) users[idx].bio = bio;
   if (photoUrl !== undefined) { users[idx].photoUrl = photoUrl; users[idx].photoSource = photoUrl ? 'local' : 'none'; }
-  if (officeHours !== undefined && users[idx].role === 'teacher') users[idx].officeHours = officeHours;
+  if (officeHours !== undefined && (users[idx].role === 'teacher' || users[idx].role === 'curator')) users[idx].officeHours = officeHours;
   await writeJSON('users.json', { users });
   res.json(safeUserStaff(users[idx]));
 });
@@ -209,7 +209,7 @@ app.get('/api/me/stats', auth, async (req, res) => {
 
 app.get('/api/groups', auth, async (req, res) => {
   const { groups } = await readJSON('groups.json');
-  if (req.user.role === 'teacher') return res.json(groups.filter(g => g.teachers?.includes(req.user.id)));
+  if (req.user.role === 'teacher' || req.user.role === 'curator') return res.json(groups.filter(g => g.teachers?.includes(req.user.id)));
   res.json(groups);
 });
 
@@ -242,7 +242,7 @@ app.get('/api/faculties', auth, async (req, res) => {
   res.json(data?.faculties || []);
 });
 
-app.get('/api/starostas', auth, requireRole('starosta', 'teacher'), async (req, res) => {
+app.get('/api/starostas', auth, requireRole('starosta', 'teacher', 'curator'), async (req, res) => {
   const { users } = await readJSON('users.json');
   const { groups } = await readJSON('groups.json');
   const facultiesData = await readJSON('faculties.json');
@@ -280,7 +280,7 @@ app.get('/api/groups/:code/official', auth, async (req, res) => {
 app.get('/api/groups/:code/working', auth, async (req, res) => {
   const code = req.params.code;
   const isStarosta = req.user.role === 'starosta' && req.user.group === code;
-  const isTeacher = req.user.role === 'teacher' && req.user.groups?.includes(code);
+  const isTeacher = (req.user.role === 'teacher' || req.user.role === 'curator') && req.user.groups?.includes(code);
   const isStudent = req.user.role === 'student' && req.user.group === code;
   if (!isStarosta && !isTeacher && !isStudent) return res.status(403).json({ error: 'Нет доступа' });
   const lists = await readJSON('working-lists.json');
@@ -332,7 +332,7 @@ app.post('/api/groups/:code/working/bulk-attendance', auth, requireRole('starost
 app.get('/api/groups/:code/working/export.csv', auth, requireRole('starosta', 'teacher'), async (req, res) => {
   const { code } = req.params;
   const isStarosta = req.user.role === 'starosta' && req.user.group === code;
-  const isTeacher = req.user.role === 'teacher' && req.user.groups?.includes(code);
+  const isTeacher = (req.user.role === 'teacher' || req.user.role === 'curator') && req.user.groups?.includes(code);
   if (!isStarosta && !isTeacher) return res.status(403).json({ error: 'Нет доступа' });
   const lists = await readJSON('working-lists.json');
   const list = lists[code];
@@ -359,7 +359,7 @@ app.get('/api/groups/:code/working/export.csv', auth, requireRole('starosta', 't
 app.get('/api/groups/:code/stats', auth, async (req, res) => {
   const code = req.params.code;
   const isStarosta = req.user.role === 'starosta' && req.user.group === code;
-  const isTeacher = req.user.role === 'teacher' && req.user.groups?.includes(code);
+  const isTeacher = (req.user.role === 'teacher' || req.user.role === 'curator') && req.user.groups?.includes(code);
   const isStudent = req.user.role === 'student' && req.user.group === code;
   if (!isStarosta && !isTeacher && !isStudent) return res.status(403).json({ error: 'Нет доступа' });
 
@@ -485,7 +485,7 @@ app.get('/api/teachers/:id/office-hours', auth, async (req, res) => {
   res.json(t.officeHours || []);
 });
 
-app.patch('/api/teachers/me/office-hours', auth, requireRole('teacher'), async (req, res) => {
+app.patch('/api/teachers/me/office-hours', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { officeHours } = req.body;
   if (!Array.isArray(officeHours)) return res.status(400).json({ error: 'officeHours должен быть массивом' });
   const { users } = await readJSON('users.json');
@@ -503,7 +503,7 @@ app.get('/api/teachers/:id/consultations', auth, async (req, res) => {
   res.json(t.consultations || []);
 });
 
-app.post('/api/teachers/me/consultations', auth, requireRole('teacher'), async (req, res) => {
+app.post('/api/teachers/me/consultations', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { title, date, time, place, slots } = req.body;
   if (!title || !date) return res.status(400).json({ error: 'Нужны title и date' });
   const { users } = await readJSON('users.json');
@@ -516,7 +516,7 @@ app.post('/api/teachers/me/consultations', auth, requireRole('teacher'), async (
   res.json(consult);
 });
 
-app.delete('/api/teachers/me/consultations/:id', auth, requireRole('teacher'), async (req, res) => {
+app.delete('/api/teachers/me/consultations/:id', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { users } = await readJSON('users.json');
   const idx = users.findIndex(u => u.id === req.user.id);
   if (idx < 0) return res.status(404).json({ error: 'Не найден' });
@@ -559,13 +559,13 @@ app.delete('/api/teachers/:id/consultations/:cid/book', auth, requireRole('staro
 app.get('/api/announcements', auth, async (req, res) => {
   const { announcements } = await readJSON('announcements.json');
   let filtered = announcements;
-  if (req.user.role === 'teacher') filtered = announcements.filter(a => a.authorId === req.user.id);
+  if (req.user.role === 'teacher' || req.user.role === 'curator') filtered = announcements.filter(a => a.authorId === req.user.id);
   else if (req.user.group) filtered = announcements.filter(a => a.groups.includes(req.user.group));
   filtered.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
   res.json(filtered);
 });
 
-app.post('/api/announcements', auth, requireRole('teacher'), async (req, res) => {
+app.post('/api/announcements', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { groups, title, text, priority } = req.body;
   if (!groups?.length || !title || !text) return res.status(400).json({ error: 'Нужны groups, title, text' });
   const data = await readJSON('announcements.json');
@@ -575,7 +575,7 @@ app.post('/api/announcements', auth, requireRole('teacher'), async (req, res) =>
   res.json(newAnn);
 });
 
-app.delete('/api/announcements/:id', auth, requireRole('teacher'), async (req, res) => {
+app.delete('/api/announcements/:id', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const data = await readJSON('announcements.json');
   const a = data.announcements.find(x => x.id === req.params.id);
   if (!a) return res.status(404).json({ error: 'Не найдено' });
@@ -588,13 +588,13 @@ app.delete('/api/announcements/:id', auth, requireRole('teacher'), async (req, r
 app.get('/api/materials', auth, async (req, res) => {
   const { materials } = await readJSON('materials.json');
   let filtered = materials;
-  if (req.user.role === 'teacher') filtered = materials.filter(m => m.authorId === req.user.id);
+  if (req.user.role === 'teacher' || req.user.role === 'curator') filtered = materials.filter(m => m.authorId === req.user.id);
   else if (req.user.group) filtered = materials.filter(m => m.group === req.user.group);
   filtered.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
   res.json(filtered);
 });
 
-app.post('/api/materials', auth, requireRole('teacher'), async (req, res) => {
+app.post('/api/materials', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { group, subject, title, description, url, type } = req.body;
   if (!group || !title || !url) return res.status(400).json({ error: 'Нужны group, title, url' });
   const data = await readJSON('materials.json');
@@ -604,7 +604,7 @@ app.post('/api/materials', auth, requireRole('teacher'), async (req, res) => {
   res.json(newMat);
 });
 
-app.delete('/api/materials/:id', auth, requireRole('teacher'), async (req, res) => {
+app.delete('/api/materials/:id', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const data = await readJSON('materials.json');
   const m = data.materials.find(x => x.id === req.params.id);
   if (!m) return res.status(404).json({ error: 'Не найдено' });
@@ -1167,13 +1167,12 @@ app.get('/api/groups/:code/rating', auth, async (req, res) => {
 // ============================================================
 
 // Получить журнал: группа + предмет для текущего препода
-app.get('/api/teacher/journal', auth, requireRole('teacher'), async (req, res) => {
-  const { group, subject } = req.query;
+app.get('/api/teacher/journal', auth, requireRole('teacher', 'curator'), async (req, res) => {
+  const { group, subject, month } = req.query;
   if (!group || !subject) return res.status(400).json({ error: 'Нужны group и subject' });
 
   const data = await readJSON('teacher-journals.json');
-  const key = group;
-  const journal = data.journals?.[key]?.[subject];
+  const journal = data.journals?.[group]?.[subject];
 
   const { users } = await readJSON('users.json');
   const students = users
@@ -1183,9 +1182,7 @@ app.get('/api/teacher/journal', auth, requireRole('teacher'), async (req, res) =
       fullName: u.fullName,
       individualPlan: !!u.individualPlan
     }));
-    
 
-  // Считаем количество Н для каждого студента (для цвета)
   const marksMap = journal?.students || {};
   const enriched = students.map(function(s) {
     const studentMarks = marksMap[s.id] || {};
@@ -1194,39 +1191,114 @@ app.get('/api/teacher/journal', auth, requireRole('teacher'), async (req, res) =
       id: s.id,
       fullName: s.fullName,
       individualPlan: !!s.individualPlan,
-      fromGroup: s.fromGroup,
       nCount: nCount,
       colorLevel: getColorLevel(nCount)
     };
   });
 
- 
-  // Всегда добавляем даты текущего месяца (без воскресений)
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  let dates = journal?.dates || [];
-  for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(year, month, day);
-    if (d.getDay() !== 0) {
-      const iso = d.toISOString().slice(0, 10);
-      if (!dates.includes(iso)) dates.push(iso);
+  // === Определяем месяц ===
+  // month в формате "YYYY-MM" (например "2026-10"). Если не передан — текущий.
+  let targetYear, targetMonth;
+  if (month && /^\d{4}-\d{2}$/.test(month)) {
+    const [y, m] = month.split('-').map(Number);
+    targetYear = y;
+    targetMonth = m - 1; // 0-11
+  } else {
+    const now = new Date();
+    targetYear = now.getFullYear();
+    targetMonth = now.getMonth();
+  }
+
+  // === Получаем расписание препода: собираем даты, когда у него ЕСТЬ пары у этой группы ===
+  const scheduleData = await readJSON('schedule.json');
+  const groupSched = scheduleData?.schedule?.[group];
+
+  // Нормализация имени для сравнения
+  function normalizeTeacher(name) {
+    return String(name || '').toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+  }
+  const teacherNorm = normalizeTeacher(req.user.fullName);
+  const teacherParts = teacherNorm.split(' ');
+
+  function isOurTeacher(t) {
+    const tNorm = normalizeTeacher(t);
+    if (!tNorm) return false;
+    if (tNorm === teacherNorm) return true;
+    const tParts = tNorm.split(' ');
+    if (tParts[0] !== teacherParts[0]) return false;
+    return !tParts[1] || !teacherParts[1] || tParts[1][0] === teacherParts[1][0];
+  }
+
+  // Собираем даты этого месяца, когда есть пара по ЭТОМУ предмету у ЭТОЙ группы с ЭТИМ преподом
+  const dates = [];
+  if (groupSched && groupSched.weeks) {
+    const startDate = new Date(groupSched.weekStartDate + 'T00:00:00');
+    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const d = new Date(targetYear, targetMonth, day);
+      const dow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][d.getDay()];
+      if (dow === 'sun') continue;
+
+      // Определяем чётность недели от начала семестра
+      const diffDays = Math.floor((d - startDate) / (1000 * 60 * 60 * 24));
+      const weekIndex = Math.floor(diffDays / 7);
+      const weekNumber = ((weekIndex % 2) + 2) % 2 + 1;
+
+      const dayData = (groupSched.weeks[String(weekNumber)] || []).find(x => x.day === dow);
+      if (!dayData || !dayData.lessons) continue;
+
+      // Есть ли в этот день пара по нашему предмету с нашим преподом
+      const hasLesson = dayData.lessons.some(function(l) {
+        return l.subject === subject && isOurTeacher(l.teacher);
+      });
+
+      if (hasLesson) {
+        dates.push(d.toISOString().slice(0, 10));
+      }
     }
   }
-  dates.sort();
+
+  // Даты, по которым уже есть отметки (даже если пары в расписании нет)
+  const markDates = [];
+  Object.values(marksMap).forEach(function(studentMarks) {
+    Object.keys(studentMarks || {}).forEach(function(d) {
+      const dd = new Date(d + 'T00:00:00');
+      if (dd.getFullYear() === targetYear && dd.getMonth() === targetMonth) {
+        if (!markDates.includes(d)) markDates.push(d);
+      }
+    });
+  });
+
+  // Объединяем и сортируем
+  const allDates = Array.from(new Set(dates.concat(markDates))).sort();
+
+  // Список доступных месяцев (только те, где есть пары) — для переключателя
+  const availableMonths = [];
+  if (groupSched && groupSched.weeks) {
+    const startDate = new Date(groupSched.weekStartDate + 'T00:00:00');
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 6);
+    const cur = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    while (cur <= endDate) {
+      availableMonths.push(cur.getFullYear() + '-' + String(cur.getMonth() + 1).padStart(2, '0'));
+      cur.setMonth(cur.getMonth() + 1);
+    }
+  }
 
   res.json({
     group: group,
     subject: subject,
-    dates: dates,
+    month: targetYear + '-' + String(targetMonth + 1).padStart(2, '0'),
+    dates: allDates,
     marks: marksMap,
-    students: enriched
+    students: enriched,
+    availableMonths: availableMonths
   });
 });
 
 // Поставить/изменить оценку
-app.post('/api/teacher/journal/mark', auth, requireRole('teacher'), async (req, res) => {
+app.post('/api/teacher/journal/mark', auth, requireRole('teacher', 'curator'), async (req, res) => {
   const { group, subject, studentId, date, mark } = req.body;
   if (!group || !subject || !studentId || !date) {
     return res.status(400).json({ error: 'Нужны group, subject, studentId, date' });
@@ -1297,10 +1369,12 @@ app.get('/api/users/:id/gradebook-average', auth, async (req, res) => {
   const grades = [];
   (gb.semesters || []).forEach(sem => {
     (sem.exams || []).forEach(e => {
-      if (typeof e.grade === 'number') grades.push(e.grade);
+      const g = parseInt(e.grade);
+      if (!isNaN(g) && g >= 2 && g <= 5) grades.push(g);
     });
     (sem.credits || []).forEach(c => {
-      if (typeof c.grade === 'number') grades.push(c.grade);
+      const g = parseInt(c.grade);
+      if (!isNaN(g) && g >= 2 && g <= 5) grades.push(g);
     });
   });
 
@@ -1500,6 +1574,78 @@ app.get('/api/curator/student/:id/summary', auth, requireRole('curator'), async 
     avgGrade: gradesCount ? (gradesSum / gradesCount).toFixed(2) : null,
     gradesCount: gradesCount
   };
+
+  res.json(result);
+});
+
+// ============================================================
+//  ПРЕДМЕТЫ ПРЕПОДАВАТЕЛЯ (из его расписания)
+// ============================================================
+
+app.get('/api/teacher/my-subjects', auth, requireRole('teacher', 'curator'), async (req, res) => {
+  const scheduleData = await readJSON('schedule.json');
+  const allSchedule = scheduleData?.schedule || {};
+
+  // Нормализация имени
+  function normalizeTeacher(name) {
+    return String(name || '').toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+  }
+  const teacherNorm = normalizeTeacher(req.user.fullName);
+  const teacherParts = teacherNorm.split(' ');
+
+  function isOurTeacher(t) {
+    const tNorm = normalizeTeacher(t);
+    if (!tNorm) return false;
+    if (tNorm === teacherNorm) return true;
+    const tParts = tNorm.split(' ');
+    if (tParts[0] !== teacherParts[0]) return false;
+    return !tParts[1] || !teacherParts[1] || tParts[1][0] === teacherParts[1][0];
+  }
+
+  // Собираем: subject -> { type -> Set(групп) }
+  const subjectsMap = {};
+
+  Object.keys(allSchedule).forEach(function(groupCode) {
+    const gs = allSchedule[groupCode];
+    if (!gs || !gs.weeks) return;
+
+    // Проходим по обеим неделям (числитель и знаменатель)
+    ['1', '2'].forEach(function(weekKey) {
+      const dayList = gs.weeks[weekKey] || [];
+      dayList.forEach(function(day) {
+        (day.lessons || []).forEach(function(l) {
+          if (!isOurTeacher(l.teacher)) return;
+
+          const subject = l.subject || 'Без названия';
+          const type = l.type || '—';
+
+          if (!subjectsMap[subject]) subjectsMap[subject] = {};
+          if (!subjectsMap[subject][type]) subjectsMap[subject][type] = new Set();
+          subjectsMap[subject][type].add(groupCode);
+        });
+      });
+    });
+  });
+
+  // Преобразуем в массив
+  const result = Object.keys(subjectsMap).sort().map(function(subject) {
+    const types = subjectsMap[subject];
+    const typeList = Object.keys(types).sort().map(function(type) {
+      return {
+        type: type,
+        groups: Array.from(types[type]).sort()
+      };
+    });
+    const allGroups = new Set();
+    Object.values(types).forEach(function(set) {
+      set.forEach(function(g) { allGroups.add(g); });
+    });
+    return {
+      subject: subject,
+      types: typeList,
+      groups: Array.from(allGroups).sort()
+    };
+  });
 
   res.json(result);
 });
