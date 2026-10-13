@@ -1168,11 +1168,13 @@ app.get('/api/groups/:code/rating', auth, async (req, res) => {
 
 // Получить журнал: группа + предмет для текущего препода
 app.get('/api/teacher/journal', auth, requireRole('teacher', 'curator'), async (req, res) => {
-  const { group, subject, month } = req.query;
+  const { group, subject, type, month } = req.query;
   if (!group || !subject) return res.status(400).json({ error: 'Нужны group и subject' });
 
+  const journalKey = type ? (subject + '|' + type) : subject;
+
   const data = await readJSON('teacher-journals.json');
-  const journal = data.journals?.[group]?.[subject];
+  const journal = data.journals?.[group]?.[journalKey];
 
   const { users } = await readJSON('users.json');
   const students = users
@@ -1250,7 +1252,9 @@ app.get('/api/teacher/journal', auth, requireRole('teacher', 'curator'), async (
 
       // Есть ли в этот день пара по нашему предмету с нашим преподом
       const hasLesson = dayData.lessons.some(function(l) {
-        return l.subject === subject && isOurTeacher(l.teacher);
+        return l.subject === subject
+            && (!type || l.type === type)
+            && isOurTeacher(l.teacher);
       });
 
       if (hasLesson) {
@@ -1289,6 +1293,7 @@ app.get('/api/teacher/journal', auth, requireRole('teacher', 'curator'), async (
   res.json({
     group: group,
     subject: subject,
+    type: type || null,
     month: targetYear + '-' + String(targetMonth + 1).padStart(2, '0'),
     dates: allDates,
     marks: marksMap,
@@ -1299,25 +1304,26 @@ app.get('/api/teacher/journal', auth, requireRole('teacher', 'curator'), async (
 
 // Поставить/изменить оценку
 app.post('/api/teacher/journal/mark', auth, requireRole('teacher', 'curator'), async (req, res) => {
-  const { group, subject, studentId, date, mark } = req.body;
+  const { group, subject, type, studentId, date, mark } = req.body;
   if (!group || !subject || !studentId || !date) {
     return res.status(400).json({ error: 'Нужны group, subject, studentId, date' });
   }
-  if (mark !== null && !['Н', 'С', '2', '3', '4', '5'].includes(mark)) {
-    return res.status(400).json({ error: 'Недопустимая оценка' });
-  }
+
+  const journalKey = type ? (subject + '|' + type) : subject;
 
   const data = await readJSON('teacher-journals.json');
   if (!data.journals[group]) data.journals[group] = {};
-  if (!data.journals[group][subject]) {
-    data.journals[group][subject] = {
+  if (!data.journals[group][journalKey]) {
+    data.journals[group][journalKey] = {
       teacherId: req.user.id,
+      subject: subject,
+      type: type || null,
       semester: getCurrentSemester(),
       dates: [],
       students: {}
     };
   }
-  const journal = data.journals[group][subject];
+  const journal = data.journals[group][journalKey];
 
   // Если сменился семестр — сбрасываем журнал
   const currentSemester = getCurrentSemester();
@@ -1422,7 +1428,9 @@ app.get('/api/teacher/attendance/:studentId', auth, async (req, res) => {
       absent += subjAbsent;
       excused += subjExcused;
 
-      bySubject[subject] = {
+      bySubject[journalKey] = {
+        subject: subjectName, 
+        type: lessonType,
         total: subjTotal,
         attended: subjAttended,
         absent: subjAbsent,
@@ -1448,8 +1456,12 @@ app.get('/api/curator/journals', auth, requireRole('curator'), async (req, res) 
   const result = [];
 
   Object.keys(data.journals || {}).forEach(function(groupCode) {
-    Object.keys(data.journals[groupCode]).forEach(function(subject) {
-      const journal = data.journals[groupCode][subject];
+    Object.keys(data.journals[groupCode]).forEach(function(journalKey) {
+      const journal = data.journals[groupCode][journalKey];
+      // journalKey может быть "Предмет" или "Предмет|Тип"
+      const parts = journalKey.split('|');
+      const subjectName = parts[0];
+      const lessonType = parts[1] || null;
       const teacher = users.find(u => u.id === journal.teacherId);
 
       // Статистика по предмету
@@ -1470,9 +1482,10 @@ app.get('/api/curator/journals', auth, requireRole('curator'), async (req, res) 
 
       const avgGrade = gradesCount ? (gradesSum / gradesCount).toFixed(2) : null;
 
-      result.push({
+        result.push({
         group: groupCode,
-        subject: subject,
+        subject: subjectName,
+        type: lessonType,
         teacherName: teacher?.fullName || 'Неизвестный',
         teacherId: journal.teacherId,
         semester: journal.semester || '—',
@@ -1490,11 +1503,13 @@ app.get('/api/curator/journals', auth, requireRole('curator'), async (req, res) 
 
 // Детальный просмотр любого журнала куратором
 app.get('/api/curator/journal', auth, requireRole('curator'), async (req, res) => {
-  const { group, subject } = req.query;
+
   if (!group || !subject) return res.status(400).json({ error: 'Нужны group и subject' });
 
   const data = await readJSON('teacher-journals.json');
-  const journal = data.journals?.[group]?.[subject];
+  const { group, subject, type } = req.query;
+  const journalKey = type ? (subject + '|' + type) : subject;
+  const journal = data.journals?.[group]?.[journalKey];
   if (!journal) return res.status(404).json({ error: 'Журнал не найден' });
 
   const { users } = await readJSON('users.json');
@@ -1542,12 +1557,15 @@ app.get('/api/curator/student/:id/summary', auth, requireRole('curator'), async 
   let gradesSum = 0, gradesCount = 0;
 
   Object.keys(data.journals || {}).forEach(function(groupCode) {
-    Object.keys(data.journals[groupCode]).forEach(function(subject) {
-      const journal = data.journals[groupCode][subject];
+    Object.keys(data.journals[groupCode]).forEach(function(journalKey) {
+      const journal = data.journals[groupCode][journalKey];
+      const parts = journalKey.split('|');
+      const subjectName = parts[0];
+      const lessonType = parts[1] || null;
       const marks = journal.students?.[studentId] || {};
       if (Object.keys(marks).length === 0) return;
 
-      const subj = { subject: subject, group: groupCode, marks: marks, n: 0, s: 0, grades: [] };
+      const subj = { subject: subjectName, type: lessonType, group: groupCode, marks: marks, n: 0, s: 0, grades: [] };
       Object.values(marks).forEach(function(m) {
         totalMarks++;
         if (m === 'Н') { subj.n++; absent++; }
