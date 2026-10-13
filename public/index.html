@@ -288,6 +288,9 @@
   .journal td.name-col { cursor: pointer; }
   .journal tbody tr:hover td:not(.name-col):not(.readonly) { background: rgba(0, 122, 255, 0.05); }
   .journal td.att-cell { width: 54px; min-width: 54px; height: 46px; cursor: pointer; }
+  .journal td.att-cell.today {
+    background: rgba(0, 122, 255, 0.06);
+  }
   .journal td.att-cell.readonly { cursor: default; }
   .journal td.att-cell .status-badge {
     display: inline-flex; align-items: center; justify-content: center;
@@ -854,18 +857,20 @@ var TABS_STAROSTA = [
 var TABS_TEACHER = [
   { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
   { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+  { key: 'my-subjects', label: 'Предметы', title: 'Мои предметы', subtitle: 'По типам и группам', accent: 'var(--tab-accent-journal)', icon: 'journal' },
   { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
   { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
 ];
 
 var TABS_CURATOR = [
-  // Сначала — вкладки преподавателя
+  // Вкладки преподавателя
   { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
   { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
-  // Потом — вкладки куратора
+  { key: 'my-subjects', label: 'Предметы', title: 'Мои предметы', subtitle: 'По типам и группам', accent: 'var(--tab-accent-journal)', icon: 'journal' },
+  // Расширенные вкладки куратора
   { key: 'curator-journals', label: 'Журналы', title: 'Журналы', subtitle: 'Все группы и предметы', accent: 'var(--tab-accent-events)', icon: 'journal' },
   { key: 'curator-students', label: 'Студенты', title: 'Студенты', subtitle: 'Сводка по успеваемости', accent: 'var(--tab-accent-starostas)', icon: 'people' },
-  // Общие сервисы
+  // Общие
   { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' },
   { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
 ];
@@ -937,6 +942,7 @@ async function renderCurrentTab() {
         else await renderSchedule();
         break;
       case 'teacher-schedule': await renderTeacherSchedule(); break;
+      case 'my-subjects': await renderTeacherSubjects(); break;
       case 'journal': await renderJournalReadOnly(); break;
       case 'stats': await renderStats(); break;
       case 'search': await renderSearchSchedule(); break;
@@ -969,7 +975,7 @@ async function renderTeacherScheduleForSelf() {
 // ============================================================
 //  ЖУРНАЛ ПРЕПОДАВАТЕЛЯ
 // ============================================================
-async function openTeacherJournal(groupCode, subject) {
+async function openTeacherJournal(groupCode, subject, month) {
   var overlay = openOverlay();
   var pop = overlay.querySelector('.popover');
   pop.style.minWidth = '90vw';
@@ -977,7 +983,9 @@ async function openTeacherJournal(groupCode, subject) {
   pop.innerHTML = '<div class="empty">Загрузка...</div>';
 
   try {
-    var data = await api('/api/teacher/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject));
+    var url = '/api/teacher/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject);
+    if (month) url += '&month=' + encodeURIComponent(month);
+    var data = await api(url);
 
     pop.innerHTML = '';
     pop.appendChild(el('div', { class: 'popover-header' }, [
@@ -985,10 +993,34 @@ async function openTeacherJournal(groupCode, subject) {
       el('p', { text: 'Группа ' + groupCode + ' · ' + data.students.length + ' студентов' })
     ]));
 
+    // Тулбар: переключение месяца + текущий месяц
+    var months = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+    var [year, mon] = data.month.split('-').map(Number);
+    var monthLabel = months[mon - 1] + ' ' + year;
 
-    // Таблица
+    var toolbar = el('div', { class: 'journal-toolbar' });
+    var leftGroup = el('div', { class: 'nav-buttons' });
+    leftGroup.appendChild(el('button', { text: '‹', onclick: function() {
+      // предыдущий доступный месяц
+      var idx = data.availableMonths.indexOf(data.month);
+      if (idx > 0) { overlay.remove(); openTeacherJournal(groupCode, subject, data.availableMonths[idx - 1]); }
+    }}));
+    leftGroup.appendChild(el('span', { class: 'range', text: monthLabel }));
+    leftGroup.appendChild(el('button', { text: '›', onclick: function() {
+      var idx = data.availableMonths.indexOf(data.month);
+      if (idx >= 0 && idx < data.availableMonths.length - 1) { overlay.remove(); openTeacherJournal(groupCode, subject, data.availableMonths[idx + 1]); }
+    }}));
+    toolbar.appendChild(leftGroup);
+
+    var rightGroup = el('div', { class: 'nav-buttons' });
+    rightGroup.appendChild(el('button', { text: 'Текущий месяц', onclick: function() {
+      overlay.remove(); openTeacherJournal(groupCode, subject, null);
+    }}));
+    toolbar.appendChild(rightGroup);
+    pop.appendChild(toolbar);
+
     if (!data.dates.length) {
-      pop.appendChild(el('div', { class: 'empty', text: 'Нет дат для отображения' }));
+      pop.appendChild(el('div', { class: 'empty', text: 'В этом месяце нет пар по этому предмету' }));
       return;
     }
 
@@ -1003,11 +1035,17 @@ async function openTeacherJournal(groupCode, subject) {
 }
 
 function buildTeacherJournalTable(data, groupCode, subject, overlay) {
+  var today = new Date().toISOString().slice(0, 10);
+
   var theadRow = el('tr', {});
   theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
   data.dates.forEach(function(d) {
-    theadRow.appendChild(el('th', { class: 'date-cell' }, [
-      el('div', { class: 'weekday', text: d.slice(8, 10) + '.' + d.slice(5, 7) })
+    var isToday = d === today;
+    var dd = new Date(d + 'T00:00:00');
+    var weekdays = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+    theadRow.appendChild(el('th', { class: 'date-cell' + (isToday ? ' today' : '') }, [
+      el('div', { class: 'weekday', text: weekdays[dd.getDay()] }),
+      el('div', { class: 'day', text: d.slice(8, 10) + '.' + d.slice(5, 7) })
     ]));
   });
 
@@ -1016,36 +1054,25 @@ function buildTeacherJournalTable(data, groupCode, subject, overlay) {
     var tr = el('tr', {});
     var nameCell = el('td', { class: 'name-col' });
 
-    // Цвет в зависимости от количества Н
-    var colorMap = {
-      none: 'var(--text)',
-      yellow: '#ffcc00',
-      orange: 'var(--orange)',
-      red: 'var(--red)'
-    };
+    var colorMap = { none: 'var(--text)', yellow: '#ffcc00', orange: 'var(--orange)', red: 'var(--red)' };
     var nameColor = colorMap[s.colorLevel] || 'var(--text)';
 
     if (s.individualPlan) {
       nameCell.appendChild(el('span', { style: 'color: var(--accent); font-weight:700; margin-right: 6px;', text: '★' }));
     }
     nameCell.appendChild(el('span', { style: 'color: ' + nameColor + '; font-weight: 600;', text: s.fullName }));
-    if (s.fromGroup) {
-      nameCell.appendChild(el('span', { style: 'color: var(--text-secondary); font-size: 11px; margin-left: 6px;', text: '(' + s.fromGroup + ')' }));
-    }
     if (s.nCount > 0) {
       nameCell.appendChild(el('span', {
         style: 'font-size: 11px; margin-left: 6px; padding: 1px 6px; border-radius: 100px; background: ' + nameColor + '20; color: ' + nameColor + '; font-weight: 700;',
         text: s.nCount + 'Н'
       }));
     }
-    if (s.fromGroup) {
-      nameCell.appendChild(el('span', { style: 'color: var(--text-secondary); font-size: 11px; margin-left: 6px;', text: '(' + s.fromGroup + ')' }));
-    }
     tr.appendChild(nameCell);
 
     data.dates.forEach(function(d) {
       var mark = (data.marks[s.id] || {})[d] || '';
-      var td = el('td', { class: 'att-cell' });
+      var isToday = d === today;
+      var td = el('td', { class: 'att-cell' + (isToday ? ' today' : '') });
       if (mark) {
         var cls = mark === 'Н' ? 'absent' : (mark === 'С' ? 'drone' : 'grade-' + mark);
         td.appendChild(el('span', { class: 'status-badge ' + cls, text: mark }));
@@ -1093,7 +1120,7 @@ function openMarkPicker(studentId, date, currentMark, groupCode, subject, parent
         });
         overlay.remove();
         parentOverlay.remove();
-        openTeacherJournal(groupCode, subject);
+        openTeacherJournal(groupCode, subject, date.slice(0, 7));
       } catch (e) { toast(e.message, true); }
     });
     pop.appendChild(item);
@@ -1112,7 +1139,7 @@ function openMarkPicker(studentId, date, currentMark, groupCode, subject, parent
         });
         overlay.remove();
         parentOverlay.remove();
-        openTeacherJournal(groupCode, subject);
+        openTeacherJournal(groupCode, subject, date.slice(0, 7));
       } catch (e) { toast(e.message, true); }
     });
     pop.appendChild(clear);
@@ -1561,6 +1588,88 @@ async function renderTeacherSchedule() {
     main.appendChild(dayGroup);
   });
   if (!hasAny) main.appendChild(el('div', { class: 'group' }, [el('div', { class: 'empty', text: 'У преподавателя пар нет на этой неделе' })]));
+}
+
+async function renderTeacherSubjects() {
+  main.innerHTML = '';
+  var subjects = await api('/api/teacher/my-subjects');
+
+  if (!subjects.length) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'У вас пока нет предметов в расписании' })
+    ]));
+    return;
+  }
+
+  // Шапка
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Мои предметы',
+    el('span', { class: 'badge badge-editable', text: subjects.length + ' шт.' })
+  ]));
+  main.appendChild(head);
+
+  // Список предметов
+  subjects.forEach(function(s) {
+    var groupBlock = el('div', { class: 'group' });
+    groupBlock.appendChild(el('div', { class: 'group-header' }, [
+      s.subject,
+      el('span', { class: 'badge badge-readonly', text: s.groups.length + ' групп' })
+    ]));
+
+    // По типам
+    s.types.forEach(function(t) {
+      var icon = '🎓';
+      if (t.type === 'Практика') icon = '📝';
+      else if (t.type === 'Лабораторная') icon = '🔬';
+      else if (t.type === 'Семинар') icon = '💬';
+      else if (t.type === 'Курсовая') icon = '📚';
+
+      var row = el('div', { class: 'row' }, [
+        el('div', {
+          class: 'avatar',
+          style: 'background: var(--accent); width: 42px; height: 42px; border-radius: 12px; font-size: 20px;',
+          text: icon
+        }),
+        el('div', { style: 'flex: 1; min-width: 0;' }, [
+          el('div', { style: 'font-weight: 600; font-size: 15px;', text: t.type }),
+          el('div', { style: 'color: var(--text-secondary); font-size: 13px; margin-top: 2px;', text: t.groups.join(', ') })
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]);
+
+      // Клик → открыть журнал для первой группы
+      row.classList.add('clickable');
+      row.addEventListener('click', function() {
+        if (t.groups.length === 1) {
+          openTeacherJournal(t.groups[0], s.subject);
+        } else {
+          // Показываем выбор группы
+          var overlay = openOverlay();
+          var pop = overlay.querySelector('.popover');
+          pop.innerHTML = '';
+          pop.appendChild(el('div', { class: 'popover-header' }, [
+            el('h3', { text: s.subject }),
+            el('p', { text: t.type })
+          ]));
+          t.groups.forEach(function(g) {
+            var item = el('div', { class: 'popover-item', onclick: function() {
+              overlay.remove();
+              openTeacherJournal(g, s.subject);
+            }}, [
+              el('div', { class: 'icon', style: 'background: var(--accent);', text: '📚' }),
+              el('div', { class: 'label', text: g })
+            ]);
+            pop.appendChild(item);
+          });
+        }
+      });
+
+      groupBlock.appendChild(row);
+    });
+
+    main.appendChild(groupBlock);
+  });
 }
 
 async function renderSearchSchedule() {
@@ -2146,6 +2255,7 @@ async function renderServices() {
       { key: 'teachers', icon: '👨‍🏫', color: '#34c759', title: 'Все преподаватели', desc: 'С фильтром по факультету' },
       { key: 'campus', icon: '🗺️', color: '#8e8e93', title: 'Карта корпусов', desc: 'Яндекс + планы' },
       { key: 'dormitories', icon: '🏠', color: '#af52de', title: 'Общежития', desc: 'Адреса и телефоны' },
+      { key: 'starostas', icon: '👥', color: '#5856d6', title: 'Каталог старост', desc: 'Все старосты' },
       { key: 'links', icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки', desc: 'ЭИОС, библиотеки' }
     );
   }
@@ -2717,7 +2827,21 @@ async function openGradebook(userId) {
   try {
     var gb = await api('/api/users/' + userId + '/gradebook');
     pop.innerHTML = '';
-    pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: 'Электронная зачётная книжка' }), el('p', { text: gb.fullName })]));
+    // Загружаем средний балл СРАЗУ
+    var avgData = await api('/api/users/' + userId + '/gradebook-average');
+
+    pop.appendChild(el('div', { class: 'popover-header' }, [
+      el('h3', { text: 'Электронная зачётная книжка' }),
+      el('p', { text: gb.fullName }),
+      avgData.average !== null
+        ? el('div', {
+            style: 'display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 12px; background: rgba(0,122,255,0.12); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--accent);',
+          }, [
+            el('span', { text: 'Средний балл:' }),
+            el('span', { text: avgData.average })
+          ])
+        : null
+    ]));
     if (gb.empty) { pop.appendChild(el('div', { class: 'empty', text: 'Зачётка пуста' })); return; }
     if (gb.specialty) {
       var specWrap = el('div', { class: 'gb-spec' });
@@ -2737,16 +2861,6 @@ async function openGradebook(userId) {
       metaWrap.appendChild(el('div', { class: 'gb-meta-row' }, [el('span', { class: 'gb-meta-lbl', text: row[0] }), el('span', { class: 'gb-meta-val', text: String(row[1] || '—') })]));
     });
     pop.appendChild(metaWrap);
-        // Средний балл
-    var avgData = await api('/api/users/' + userId + '/gradebook-average');
-    if (avgData.average !== null) {
-      var avgWrap = el('div', { class: 'gb-meta', style: 'text-align:center; padding: 20px; margin: 8px 8px 0;' }, [
-        el('div', { style: 'font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;', text: 'Средний балл' }),
-        el('div', { style: 'font-size: 42px; font-weight: 800; letter-spacing: -0.04em; color: var(--accent); margin-top: 4px;', text: avgData.average }),
-        el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: 'по ' + avgData.count + ' предметам' })
-      ]);
-      pop.appendChild(avgWrap);
-    }
     (gb.semesters || []).forEach(function(sem) {
       var semWrap = el('div', { class: 'gb-semester' });
       semWrap.appendChild(el('div', { class: 'gb-semester-title', text: sem.label }));
@@ -2911,41 +3025,73 @@ async function openCuratorJournalDetail(groupCode, subject) {
 async function renderCuratorStudents() {
   main.innerHTML = '';
 
-  var { users } = { users: [] };
-  // Получаем список всех студентов через свой эндпоинт
+  // Загружаем все группы
   var allGroups = await api('/api/all-groups');
-  var allStudents = [];
 
-  for (var i = 0; i < allGroups.length; i++) {
-    try {
-      var list = await api('/api/groups/' + encodeURIComponent(allGroups[i].code) + '/official');
-      list.forEach(function(s) {
-        if (s.userId) allStudents.push({ userId: s.userId, fullName: s.fullName, group: allGroups[i].code, individualPlan: s.individualPlan });
-      });
-    } catch (e) {}
+  if (!allGroups.length) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'Групп не найдено' })
+    ]));
+    return;
   }
 
+  // Загружаем студентов для каждой группы
+  var groupsWithStudents = await Promise.all(allGroups.map(async function(g) {
+    try {
+      var list = await api('/api/groups/' + encodeURIComponent(g.code) + '/official');
+      return { code: g.code, name: g.name, facultyName: g.facultyName, students: list || [] };
+    } catch (e) {
+      return { code: g.code, name: g.name, facultyName: g.facultyName, students: [] };
+    }
+  }));
+
+  // Считаем общее количество
+  var totalStudents = groupsWithStudents.reduce(function(sum, g) { return sum + g.students.length; }, 0);
+
+  // Шапка
   var head = el('div', { class: 'group' });
   head.appendChild(el('div', { class: 'group-header' }, [
-    'Все студенты',
-    el('span', { class: 'badge badge-editable', text: allStudents.length + ' чел.' })
+    'Студенты по группам',
+    el('span', { class: 'badge badge-editable', text: totalStudents + ' чел. · ' + groupsWithStudents.length + ' групп' })
   ]));
   main.appendChild(head);
 
-  var list = el('div', { class: 'group' });
-  allStudents.forEach(function(s) {
-    var row = el('div', { class: 'row clickable', onclick: function() {
-      state.curatorStudentId = s.userId;
-      switchTab('curator-student-detail');
-    }}, [
-      el('div', { class: 'idx', text: s.individualPlan ? '★' : '' , style: s.individualPlan ? 'color: var(--accent); font-weight: 700;' : ''}),
-      el('div', { class: 'name', text: s.fullName }),
-      el('div', { class: 'zach', text: s.group }),
-      el('div', { class: 'chevron', text: '›' })
-    ]);
-    list.appendChild(row);
+  // Для каждой группы — свой блок
+  groupsWithStudents.forEach(function(g) {
+    var groupBlock = el('div', { class: 'group' });
+
+    // Заголовок группы
+    groupBlock.appendChild(el('div', { class: 'group-header' }, [
+      el('span', { text: g.code + (g.name ? ' · ' + g.name : '') }),
+      el('span', { class: 'badge badge-readonly', text: g.students.length + ' чел.' })
+    ]));
+
+    // Студенты
+    var body = el('div', { class: 'group-body' });
+    if (!g.students.length) {
+      body.appendChild(el('div', { class: 'empty', text: 'Нет студентов' }));
+    } else {
+      g.students.forEach(function(s, idx) {
+        var row = el('div', { class: 'row clickable', onclick: function() {
+          if (s.userId) {
+            state.curatorStudentId = s.userId;
+            switchTab('curator-student-detail');
+          }
+        }}, [
+          el('div', { class: 'idx', text: String(idx + 1) }),
+          el('div', { class: 'name' }, [
+            s.individualPlan ? el('span', { style: 'color: var(--accent); font-weight: 700; margin-right: 6px;', text: '★' }) : null,
+            el('span', { text: s.fullName })
+          ]),
+          el('div', { class: 'zach', text: s.zachetka || '' }),
+          el('div', { class: 'chevron', text: '›' })
+        ]);
+        body.appendChild(row);
+      });
+    }
+    groupBlock.appendChild(body);
+    main.appendChild(groupBlock);
   });
-  main.appendChild(list);
 }
 
 async function renderCuratorStudentDetail() {
