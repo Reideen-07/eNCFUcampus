@@ -1018,7 +1018,7 @@ async function renderTeacherScheduleForSelf() {
 // ============================================================
 //  ЖУРНАЛ ПРЕПОДАВАТЕЛЯ
 // ============================================================
-async function openTeacherJournal(groupCode, subject, month) {
+async function openTeacherJournal(groupCode, subject, type, month) {
   var overlay = openOverlay();
   var pop = overlay.querySelector('.popover');
   pop.style.minWidth = '90vw';
@@ -1026,13 +1026,15 @@ async function openTeacherJournal(groupCode, subject, month) {
   pop.innerHTML = '<div class="empty">Загрузка...</div>';
 
   try {
-    var url = '/api/teacher/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject);
+    var url = '/api/teacher/journal?group=' + encodeURIComponent(groupCode)
+            + '&subject=' + encodeURIComponent(subject);
+    if (type) url += '&type=' + encodeURIComponent(type);   
     if (month) url += '&month=' + encodeURIComponent(month);
     var data = await api(url);
 
     pop.innerHTML = '';
     pop.appendChild(el('div', { class: 'popover-header' }, [
-      el('h3', { text: subject }),
+      el('h3', { text: subject + (type ? ' · ' + type : '') }),
       el('p', { text: 'Группа ' + groupCode + ' · ' + data.students.length + ' студентов' })
     ]));
 
@@ -1046,18 +1048,20 @@ async function openTeacherJournal(groupCode, subject, month) {
     leftGroup.appendChild(el('button', { text: '‹', onclick: function() {
       // предыдущий доступный месяц
       var idx = data.availableMonths.indexOf(data.month);
-      if (idx > 0) { overlay.remove(); openTeacherJournal(groupCode, subject, data.availableMonths[idx - 1]); }
+      if (idx > 0) { overlay.remove(); openTeacherJournal(groupCode, subject, type, data.availableMonths[idx - 1]); }
     }}));
     leftGroup.appendChild(el('span', { class: 'range', text: monthLabel }));
     leftGroup.appendChild(el('button', { text: '›', onclick: function() {
       var idx = data.availableMonths.indexOf(data.month);
-      if (idx >= 0 && idx < data.availableMonths.length - 1) { overlay.remove(); openTeacherJournal(groupCode, subject, data.availableMonths[idx + 1]); }
+      if (idx >= 0 && idx < data.availableMonths.length - 1) { 
+        overlay.remove(); 
+        openTeacherJournal(groupCode, subject, type, data.availableMonths[idx + 1]); }
     }}));
     toolbar.appendChild(leftGroup);
 
     var rightGroup = el('div', { class: 'nav-buttons' });
     rightGroup.appendChild(el('button', { text: 'Текущий месяц', onclick: function() {
-      overlay.remove(); openTeacherJournal(groupCode, subject, null);
+      overlay.remove(); openTeacherJournal(groupCode, subject, type, null);
     }}));
     toolbar.appendChild(rightGroup);
     pop.appendChild(toolbar);
@@ -1068,7 +1072,7 @@ async function openTeacherJournal(groupCode, subject, month) {
     }
 
     var wrapper = el('div', { class: 'journal-wrapper' });
-    var table = buildTeacherJournalTable(data, groupCode, subject, overlay);
+    var table = buildTeacherJournalTable(data, groupCode, subject, type, overlay);
     wrapper.appendChild(table);
     pop.appendChild(wrapper);
 
@@ -1077,7 +1081,7 @@ async function openTeacherJournal(groupCode, subject, month) {
   }
 }
 
-function buildTeacherJournalTable(data, groupCode, subject, overlay) {
+function buildTeacherJournalTable(data, groupCode, subject, type, overlay) {
   var today = new Date().toISOString().slice(0, 10);
 
   var theadRow = el('tr', {});
@@ -1121,7 +1125,7 @@ function buildTeacherJournalTable(data, groupCode, subject, overlay) {
         td.appendChild(el('span', { class: 'status-badge ' + cls, text: mark }));
       }
       td.addEventListener('click', function() {
-        openMarkPicker(s.id, d, mark, groupCode, subject, overlay);
+        openMarkPicker(s.id, d, mark, groupCode, subject, type, overlay);
       });
       tr.appendChild(td);
     });
@@ -1131,7 +1135,7 @@ function buildTeacherJournalTable(data, groupCode, subject, overlay) {
   return el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]);
 }
 
-function openMarkPicker(studentId, date, currentMark, groupCode, subject, parentOverlay) {
+function openMarkPicker(studentId, date, currentMark, groupCode, subject, type, parentOverlay) {
   var overlay = openOverlay();
   var pop = overlay.querySelector('.popover');
   pop.innerHTML = '';
@@ -1159,11 +1163,11 @@ function openMarkPicker(studentId, date, currentMark, groupCode, subject, parent
       try {
         await api('/api/teacher/journal/mark', {
           method: 'POST',
-          body: JSON.stringify({ group: groupCode, subject: subject, studentId: studentId, date: date, mark: opt.key })
+          body: JSON.stringify({ group: groupCode, subject: subject, type: type, studentId: studentId, date: date, mark: opt.key })
         });
         overlay.remove();
         parentOverlay.remove();
-        openTeacherJournal(groupCode, subject, date.slice(0, 7));
+        openTeacherJournal(groupCode, subject, type, date.slice(0, 7));
       } catch (e) { toast(e.message, true); }
     });
     pop.appendChild(item);
@@ -1178,11 +1182,11 @@ function openMarkPicker(studentId, date, currentMark, groupCode, subject, parent
       try {
         await api('/api/teacher/journal/mark', {
           method: 'POST',
-          body: JSON.stringify({ group: groupCode, subject: subject, studentId: studentId, date: date, mark: null })
+          body: JSON.stringify({ group: groupCode, subject: subject, type: type, studentId: studentId, date: date, mark: null })
         });
         overlay.remove();
         parentOverlay.remove();
-        openTeacherJournal(groupCode, subject, date.slice(0, 7));
+        openTeacherJournal(groupCode, subject, type, date.slice(0, 7));
       } catch (e) { toast(e.message, true); }
     });
     pop.appendChild(clear);
@@ -1251,7 +1255,7 @@ async function renderHomeForTeacher() {
         if (l.group) {
           lessonRow.style.cursor = 'pointer';
           lessonRow.addEventListener('click', function() {
-            openTeacherJournal(l.group, l.subject);
+            openTeacherJournal(l.group, l.subject, l.type);
           });
         }
 
@@ -1685,7 +1689,7 @@ async function renderTeacherSubjects() {
       row.classList.add('clickable');
       row.addEventListener('click', function() {
         if (t.groups.length === 1) {
-          openTeacherJournal(t.groups[0], s.subject);
+          openTeacherJournal(t.groups[0], s.subject, t.type);
         } else {
           // Показываем выбор группы
           var overlay = openOverlay();
@@ -1698,7 +1702,7 @@ async function renderTeacherSubjects() {
           t.groups.forEach(function(g) {
             var item = el('div', { class: 'popover-item', onclick: function() {
               overlay.remove();
-              openTeacherJournal(g, s.subject);
+              openTeacherJournal(g, s.subject, t.type);
             }}, [
               el('div', { class: 'icon', style: 'background: var(--accent);', text: '📚' }),
               el('div', { class: 'label', text: g })
@@ -1957,6 +1961,23 @@ async function openFullStats(userId) {
     var stats = await api('/api/users/' + userId + '/full-stats');
     pop.innerHTML = '';
     pop.appendChild(el('div', { class: 'popover-header' }, [el('h3', { text: user.fullName }), el('p', { text: 'Посещаемость: ' + stats.percent + '%' })]));
+
+    // Кнопки действий (Зачётка + Профиль) — только для студента/старосты
+    if (user.role === 'student' || user.role === 'starosta') {
+      var actions = el('div', { style: 'display:flex; gap:8px; padding: 8px 16px 4px;' });
+      actions.appendChild(el('button', {
+        class: 'btn', style: 'flex:1; background: var(--indigo);',
+        text: '📚 Зачётка',
+        onclick: function() { overlay.remove(); openGradebook(userId); }
+      }));
+      actions.appendChild(el('button', {
+        class: 'btn btn-secondary', style: 'flex:1;',
+        text: '👤 Профиль',
+        onclick: function() { overlay.remove(); openUserProfile(userId); }
+      }));
+      pop.appendChild(actions);
+    }
+
     pop.appendChild(el('div', { html: buildDonutSVG(stats, 160), style: 'display:flex; justify-content:center; padding:16px;' }));
     pop.appendChild(el('div', { class: 'stats-grid', style: 'padding:0 16px 16px;' }, [
       el('div', { class: 'stat-cell red' }, [el('div', { class: 'num', text: String(stats.absent) }), el('div', { class: 'lbl', text: 'пропуск' })]),
@@ -2980,10 +3001,10 @@ async function renderCuratorJournals() {
 
     byGroup[groupCode].forEach(function(j) {
       var row = el('div', { class: 'row clickable', onclick: function() {
-        openCuratorJournalDetail(j.group, j.subject);
+        openCuratorJournalDetail(j.group, j.subject, j.type);
       }}, [
         el('div', { style: 'flex:1; min-width: 0;' }, [
-          el('div', { style: 'font-weight:600; font-size: 15px;', text: j.subject }),
+          el('div', { style: 'font-weight:600; font-size: 15px;', text: j.subject + (j.type ? ' · ' + j.type : '') }),
           el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: j.teacherName + ' · семестр ' + j.semester })
         ]),
         el('div', { style: 'display:flex; flex-direction:column; align-items:flex-end; gap: 4px;' }, [
@@ -2999,7 +3020,7 @@ async function renderCuratorJournals() {
   });
 }
 
-async function openCuratorJournalDetail(groupCode, subject) {
+async function openCuratorJournalDetail(groupCode, subject, type) {
   var overlay = openOverlay();
   var pop = overlay.querySelector('.popover');
   pop.style.minWidth = '90vw';
@@ -3007,11 +3028,14 @@ async function openCuratorJournalDetail(groupCode, subject) {
   pop.innerHTML = '<div class="empty">Загрузка...</div>';
 
   try {
-    var data = await api('/api/curator/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject));
+    var url = '/api/curator/journal?group=' + encodeURIComponent(groupCode)
+        + '&subject=' + encodeURIComponent(subject);
+    if (type) url += '&type=' + encodeURIComponent(type);
+    var data = await api(url);
 
     pop.innerHTML = '';
     pop.appendChild(el('div', { class: 'popover-header' }, [
-      el('h3', { text: subject }),
+      el('h3', { text: subject + (type ? ' · ' + type : '') }),
       el('p', { text: groupCode + ' · семестр ' + data.semester })
     ]));
 
