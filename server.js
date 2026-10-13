@@ -475,12 +475,12 @@ app.delete('/api/events/:id', auth, requireRole('starosta'), async (req, res) =>
 
 app.get('/api/teachers', auth, async (req, res) => {
   const { users } = await readJSON('users.json');
-  res.json(users.filter(u => u.role === 'teacher').map(u => safeUserFor(req.user, u)));
+  res.json(users.filter(u => u.role === 'teacher' || u.role === 'curator').map(u => safeUserFor(req.user, u)));
 });
 
 app.get('/api/teachers/:id/office-hours', auth, async (req, res) => {
   const { users } = await readJSON('users.json');
-  const t = users.find(u => u.id === req.params.id && u.role === 'teacher');
+  const t = users.find(u => u.id === req.params.id && (u.role === 'teacher' || u.role === 'curator'));
   if (!t) return res.status(404).json({ error: 'Преподаватель не найден' });
   res.json(t.officeHours || []);
 });
@@ -498,7 +498,7 @@ app.patch('/api/teachers/me/office-hours', auth, requireRole('teacher', 'curator
 
 app.get('/api/teachers/:id/consultations', auth, async (req, res) => {
   const { users } = await readJSON('users.json');
-  const t = users.find(u => u.id === req.params.id && u.role === 'teacher');
+  const t = users.find(u => u.id === req.params.id && (u.role === 'teacher' || u.role === 'curator'));
   if (!t) return res.status(404).json({ error: 'Преподаватель не найден' });
   res.json(t.consultations || []);
 });
@@ -912,7 +912,7 @@ app.get('/api/teachers/:id/schedule', auth, async (req, res) => {
   const offset = parseInt(req.query.offset) || 0;
 
   const { users } = await readJSON('users.json');
-  const teacher = users.find(u => u.id === teacherId && u.role === 'teacher');
+  const teacher = users.find(u => u.id === teacherId && (u.role === 'teacher' || u.role === 'curator'));
   if (!teacher) return res.status(404).json({ error: 'Преподаватель не найден' });
 
   const teacherName = teacher.fullName;
@@ -1007,7 +1007,7 @@ app.get('/api/teachers/:id/schedule', auth, async (req, res) => {
 app.get('/api/teachers/:id/schedule/weeks', auth, async (req, res) => {
   const teacherId = req.params.id;
   const { users } = await readJSON('users.json');
-  const teacher = users.find(u => u.id === teacherId && u.role === 'teacher');
+  const teacher = users.find(u => u.id === teacherId && (u.role === 'teacher' || u.role === 'curator'));
   if (!teacher) return res.status(404).json({ error: 'Преподаватель не найден' });
 
   const now = new Date();
@@ -1063,7 +1063,7 @@ app.get('/api/search', auth, async (req, res) => {
   const foundGroups = groups.filter(g => (g.code + ' ' + (g.name || '')).toLowerCase().indexOf(q) !== -1);
 
   const foundTeachers = users
-    .filter(u => u.role === 'teacher' && u.fullName.toLowerCase().indexOf(q) !== -1)
+    .filter(u => (u.role === 'teacher' || u.role === 'curator') && u.fullName.toLowerCase().indexOf(q) !== -1)
     .map(u => ({ id: u.id, fullName: u.fullName, faculty: u.faculty, bio: u.bio }));
 
   res.json({ groups: foundGroups, teachers: foundTeachers });
