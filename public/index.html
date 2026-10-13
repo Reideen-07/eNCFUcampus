@@ -181,6 +181,28 @@
     min-height: 32px; box-sizing: border-box;
     display: inline-flex; align-items: center;
   }
+  .header .user-info .icon-btn {
+    background: var(--gray-bg);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    padding: 0;
+    transition: background 0.2s;
+  }
+  .header .user-info .icon-btn:hover {
+    background: rgba(120, 120, 128, 0.2);
+  }
+  .header .user-info .icon-btn .icon-svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
   .page-title {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: sticky; top: 78px; z-index: 50; padding: 32px 24px 12px;
@@ -483,7 +505,26 @@
     max-width: calc(100vw - 32px); overflow-x: auto;
   }
   .tab-bar::-webkit-scrollbar { display: none; }
-  .tab-bar button { background: transparent; border: none; padding: 8px 14px; border-radius: 100px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-secondary); font-family: inherit; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tab-bar button {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .tab-bar button:hover {
+    background: rgba(120, 120, 128, 0.12);
+  }
+  .tab-bar button.active {
+    background: var(--accent);
+    color: #fff;
+  }
   .tab-bar button .icon-svg { width: 24px; height: 24px; stroke-width: 1.6; }
   .tab-bar button.active { background: var(--accent); color: #fff; }
   .tab-bar button.active .icon-svg { stroke-width: 2.2; }
@@ -623,9 +664,12 @@
       <span class='text'>СКФУ</span>
     </div>
     <div class='user-info'>
-      <span class='group' id='me-group'></span>
-      <button id='inbox-btn' class='hidden'>Входящие</button>
-      <button id='logout-btn'>Выйти</button>
+      <button id='inbox-btn' class='hidden icon-btn' title='Входящие'>
+        <svg class='icon-svg' viewBox='0 0 24 24'><path d='M3 8l9 6 9-6'/><rect x='3' y='5' width='18' height='14' rx='2'/></svg>
+      </button>
+      <button id='logout-btn' class='icon-btn' title='Выйти'>
+        <svg class='icon-svg' viewBox='0 0 24 24'><path d='M16 17l5-5-5-5'/><path d='M21 12H9'/><path d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/></svg>
+      </button>
     </div>
   </div>
 
@@ -886,9 +930,8 @@ function buildTabBar() {
   var bar = document.getElementById('tab-bar');
   bar.innerHTML = '';
   getTabs().forEach(function(t) {
-    var btn = el('button', { 'data-tab': t.key, onclick: function() { switchTab(t.key); } });
+    var btn = el('button', { 'data-tab': t.key, title: t.label, onclick: function() { switchTab(t.key); } });
     btn.appendChild(iconNode(t.icon));
-    btn.appendChild(el('span', { text: t.label }));
     bar.appendChild(btn);
   });
 }
@@ -3227,7 +3270,6 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
 async function enterApp() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
-  document.getElementById('me-group').textContent = state.user.group || (state.user.role === 'teacher' ? 'Преподаватель' : '');
   buildTabBar();
   var tabs = getTabs();
   switchTab(tabs[0].key);
