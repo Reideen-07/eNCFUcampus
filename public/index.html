@@ -732,6 +732,73 @@ function t(key) {
   return (TRANSLATIONS[LANG] && TRANSLATIONS[LANG][key]) || (TRANSLATIONS.ru[key]) || key;
 }
 
+// Сколько дней осталось до даты (может быть отрицательным)
+function daysUntil(iso) {
+  if (!iso) return null;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var d = new Date(iso + 'T00:00:00');
+  return Math.round((d - today) / 86400000);
+}
+
+function getExpiryWarning(user) {
+  if (!user || !user.isForeign) return null;
+  var checks = [];
+  if (user.registrationUntil) checks.push({
+    label: 'временной регистрации',
+    date: user.registrationUntil,
+    days: daysUntil(user.registrationUntil)
+  });
+  if (user.visaUntil) checks.push({
+    label: 'визы',
+    date: user.visaUntil,
+    days: daysUntil(user.visaUntil)
+  });
+  if (!checks.length) return null;
+  checks.sort(function(a, b) { return a.days - b.days; });
+  var soonest = checks[0];
+  if (soonest.days > 30) return null;   // порог: 30 дней
+  return soonest;
+}
+
+function buildExpiryBanner(warn) {
+  if (!warn) return null;
+  var days = warn.days;
+  var isExpired = days < 0;
+  var title, subtitle;
+
+  if (isExpired) {
+    title = 'Срок ' + warn.label + ' истёк!';
+    subtitle = 'Просрочено на ' + Math.abs(days) + ' ' + plural(Math.abs(days), 'день', 'дня', 'дней') +
+               '. Срочно обратитесь в кабинет №1.';
+  } else if (days === 0) {
+    title = 'Срок ' + warn.label + ' истекает сегодня';
+    subtitle = 'Просим обратиться в кабинет №1.';
+  } else {
+    title = 'Срок ' + warn.label + ' истекает через ' + days + ' ' + plural(days, 'день', 'дня', 'дней');
+    subtitle = 'Уведомляем вас об окончании срока. Просим обратиться в кабинет №1.';
+  }
+
+  var banner = el('div', {
+    style: [
+      'background: rgba(255, 59, 48, 0.12)',
+      'border: 1px solid rgba(255, 59, 48, 0.35)',
+      'border-radius: 18px',
+      'padding: 16px 18px',
+      'margin: 0 0 20px',
+      'display: flex',
+      'gap: 14px',
+      'align-items: flex-start'
+    ].join('; ')
+  });
+  banner.appendChild(el('div', { style: 'font-size: 24px; line-height: 1; flex-shrink: 0;', text: '⚠️' }));
+  var textWrap = el('div', { style: 'flex: 1; min-width: 0;' });
+  textWrap.appendChild(el('div', { style: 'color: var(--red); font-weight: 700; font-size: 15px; margin-bottom: 4px;', text: title }));
+  textWrap.appendChild(el('div', { style: 'color: var(--text); font-size: 13px; line-height: 1.45;', text: subtitle }));
+  textWrap.appendChild(el('div', { style: 'color: var(--text-secondary); font-size: 12px; margin-top: 6px;', text: 'Дата: ' + formatDate(warn.date) }));
+  banner.appendChild(textWrap);
+  return banner;
+}
+
 var JOURNAL_DAYS = 14;
 
 var state = {
@@ -1323,6 +1390,9 @@ async function renderHome() {
   main.innerHTML = '';
   var me = state.user;
   var stats = await api('/api/me/stats');
+    // Красный баннер об окончании регистрации/визы
+  var warn = getExpiryWarning(me);
+  if (warn) main.appendChild(buildExpiryBanner(warn));
   var hero = el('div', { class: 'hero-card' }, [
     el('div', { class: 'lbl', text: 'Моя посещаемость' }),
     el('div', { class: 'big', html: stats.percent + '<span>%</span>' }),
@@ -2843,6 +2913,8 @@ async function openUserProfile(userId) {
   pop.innerHTML = '<div class="empty">Загрузка...</div>';
   try {
     var user = await api('/api/users/' + userId);
+    var warn = getExpiryWarning(user);
+    if (warn) pop.appendChild(buildExpiryBanner(warn));
     var stats = { total: 0 };
     try { stats = await api('/api/users/' + userId + '/stats'); } catch(e) {}
     var officeHours = [], consultations = [];
