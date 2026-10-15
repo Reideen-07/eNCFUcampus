@@ -1892,6 +1892,52 @@ app.get('/api/admin/journals', auth, requireAdmin, async (req, res) => {
   res.json(result);
 });
 
+// ============================================================
+//  АДМИН: журнал по группе + предмету
+// ============================================================
+
+app.get('/api/admin/journal', auth, requireAdmin, async (req, res) => {
+  const { group, subject } = req.query;
+  if (!group || !subject) return res.status(400).json({ error: 'Нужны group и subject' });
+
+  // Проверка доступа
+  if (!(await isGroupAccessible(req.user, group))) {
+    return res.status(403).json({ error: 'Нет доступа к этой группе' });
+  }
+
+  const data = await readJSON('teacher-journals.json');
+  const journal = data.journals?.[group]?.[subject];
+  if (!journal) return res.status(404).json({ error: 'Журнал не найден' });
+
+  const { users } = await readJSON('users.json');
+  const teacher = users.find(u => u.id === journal.teacherId);
+
+  // Студенты группы (только из этой группы)
+  const students = users
+    .filter(u => (u.role === 'student' || u.role === 'starosta') && u.group === group)
+    .map(function(u) {
+      const marks = journal.students?.[u.id] || {};
+      const nCount = Object.values(marks).filter(m => m === 'Н').length;
+      return {
+        id: u.id,
+        fullName: u.fullName,
+        individualPlan: !!u.individualPlan,
+        marks: marks,
+        nCount: nCount,
+        colorLevel: getColorLevel(nCount)
+      };
+    });
+
+  res.json({
+    group: group,
+    subject: subject,
+    teacherName: teacher?.fullName || 'Неизвестный',
+    semester: journal.semester || '—',
+    dates: journal.dates || [],
+    students: students
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
