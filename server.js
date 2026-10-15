@@ -1668,6 +1668,230 @@ app.get('/api/teacher/my-subjects', auth, requireRole('teacher', 'curator'), asy
   res.json(result);
 });
 
+// ============================================================
+//  АДМИН (декан / ректор)
+// ============================================================
+
+// Middleware — только админ
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Только для администрации' });
+  next();
+}
+
+// Проверка: доступна ли админу эта группа
+async function isGroupAccessible(admin, groupCode) {
+  if (admin.scope === 'university') return true; // ректор — всё
+  if (admin.scope === 'faculty') {
+    const { groups } = await readJSON('groups.json');
+    const g = groups.find(x => x.code === groupCode);
+    return g && g.faculty === admin.facultyId;
+  }
+  return false;
+}
+
+// Список факультетов, к которым есть доступ
+async function getAllowedFaculties(admin) {
+  const data = await readJSON('faculties.json');
+  const faculties = data?.faculties || [];
+  if (admin.scope === 'university') return faculties;
+  return faculties.filter(f => f.id === admin.facultyId);
+}
+
+// ОБЗОР — агрегированные цифры
+app.get('/api/admin/overview', auth, requireAdmin, async (req, res) => {
+  const { users } = await readJSON('users.json');
+  const { groups } = await readJSON('groups.json');
+  const journalsData = await readJSON('teacher-journals.json');
+  const { announcements } = await readJSON('announcements.json');
+
+  const allowedFaculties = await getAllowedFaculties(req.user);
+  const allowedFacultyIds = allowedFaculties.map(f => f.id);
+
+  const allowedGroups = req.user.scope === 'university'
+    ? groups
+    : groups.filter(g => allowedFacultyIds.includes(g.faculty));
+  const allowedGroupCodes = allowedGroups.map(g => g.code);
+
+  const students = users.filter(u =>
+    (u.role === 'student' || u.role === 'starosta') && allowedGroupCodes.includes(u.group)
+  );
+  const teachers = users.filter(u => u.role === 'teacher' && (req.user.scope === 'university' || (u.groups || []).some(g => allowedGroupCodes.includes(g))));
+  const curators = users.filter(u => u.role === 'curator' && (req.user.scope === 'university' || (u.groups || []).some(g => allowedGroupCodes.includes(g))));
+  const starostas = users.filter(u => u.role === 'starosta' && allowedGroupCodes.includes(u.group));
+
+  const journals = journalsData?.journals || {};
+  let journalCount = 0;
+  Object.keys(journals).forEach(function(gc) {
+    if (!allowedGroupCodes.includes(gc)) return;
+    Object.keys(journals[gc]).forEach(function() { journalCount++; });
+  });
+
+  const relevantAnnouncements = announcements.filter(a =>
+    req.user.scope === 'university' || (a.groups || []).some(g => allowedGroupCodes.includes(g))
+  );
+
+  res.json({
+    scope: req.user.scope,
+    facultyId: req.user.facultyId || null,
+    faculties: allowedFaculties.length,
+    groups: allowedGroups.length,
+    students: students.length,
+    teachers: teachers.length,
+    curators: curators.length,
+    starostas: starostas.length,
+    journals: journalCount,
+    announcements: relevantAnnouncements.length
+  });
+});
+
+// ВСЕ ГРУППЫ (с фильтром)
+app.get('/api/admin/groups', auth, requireAdmin, async (req, res) => {
+  const { groups } = await readJSON('groups.json');
+  const { users } = await readJSON('users.json');
+  const facultiesData = await readJSON('faculties.json');
+  const faculties = facultiesData?.faculties || [];
+
+  const allowedFaculties = await getAllowedFaculties(req.user);
+  const allowedFacultyIds = allowedFaculties.map(f => f.id);
+
+  const filtered = req.user.scope === 'university'
+    ? groups
+    : groups.filter(g => allowedFacultyIds.includes(g.faculty));
+
+  const enriched = filtered.map(function(g) {
+    const fac = g.faculty ? faculties.find(f => f.id === g.faculty) : null;
+    const students = users.filter(u => (u.role === 'student' || u.role === 'starosta') && u.group === g.code);
+    const starosta = users.find(u => u.role === 'starosta' && u.group === g.code);
+    const curator = g.curatorId ? users.find(u => u.id === g.curatorId) : null;
+    return {
+      code: g.code,
+      name: g.name || '',
+      course: g.course || null,
+      facultyId: g.faculty || null,
+      facultyName: fac?.shortName || fac?.name || '',
+      studentsCount: students.length,
+      starostaName: starosta?.fullName || null,
+      curatorName: curator?.fullName || null
+    };
+  });
+
+  res.json(enriched);
+});
+
+// ВСЕ СТУДЕНТЫ
+app.get('/api/admin/students', auth, requireAdmin, async (req, res) => {
+  const { groups } = await readJSON('groups.json');
+  const { users } = await readJSON('users.json');
+
+  const allowedFaculties = await getAllowedFaculties(req.user);
+  const allowedFacultyIds = allowedFaculties.map(f => f.id);
+  const allowedGroups = req.user.scope === 'university'
+    ? groups
+    : groups.filter(g => allowedFacultyIds.includes(g.faculty));
+  const allowedGroupCodes = allowedGroups.map(g => g.code);
+
+  const students = users
+    .filter(u => (u.role === 'student' || u.role === 'starosta') && allowedGroupCodes.includes(u.group))
+    .map(u => ({
+      id: u.id,
+      fullName: u.fullName,
+      group: u.group,
+      email: u.email,
+      individualPlan: !!u.individualPlan,
+      role: u.role,
+      birthday: u.birthday
+    }))
+    .sort((a, b) => (a.group + a.fullName).localeCompare(b.group + b.fullName));
+
+  res.json(students);
+});
+
+// ВСЕ ПРЕПОДАВАТЕЛИ
+app.get('/api/admin/teachers', auth, requireAdmin, async (req, res) => {
+  const { users } = await readJSON('users.json');
+  const { groups } = await readJSON('groups.json');
+  const facultiesData = await readJSON('faculties.json');
+  const faculties = facultiesData?.faculties || [];
+
+  const allowedFaculties = await getAllowedFaculties(req.user);
+  const allowedFacultyIds = allowedFaculties.map(f => f.id);
+  const allowedGroups = req.user.scope === 'university'
+    ? groups
+    : groups.filter(g => allowedFacultyIds.includes(g.faculty));
+  const allowedGroupCodes = allowedGroups.map(g => g.code);
+
+  const teachers = users
+    .filter(u => u.role === 'teacher' || u.role === 'curator')
+    .filter(u => req.user.scope === 'university' || (u.groups || []).some(g => allowedGroupCodes.includes(g)))
+    .map(u => {
+      const fac = u.faculty ? faculties.find(f => f.id === u.faculty) : null;
+      return {
+        id: u.id,
+        fullName: u.fullName,
+        role: u.role,
+        email: u.email,
+        bio: u.bio || '',
+        facultyId: u.faculty || null,
+        facultyName: fac?.shortName || fac?.name || '',
+        groups: u.groups || []
+      };
+    })
+    .sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+  res.json(teachers);
+});
+
+// ВСЕ ЖУРНАЛЫ (с фильтром)
+app.get('/api/admin/journals', auth, requireAdmin, async (req, res) => {
+  const journalsData = await readJSON('teacher-journals.json');
+  const { users } = await readJSON('users.json');
+
+  const allowedFaculties = await getAllowedFaculties(req.user);
+  const allowedFacultyIds = allowedFaculties.map(f => f.id);
+  const { groups } = await readJSON('groups.json');
+  const allowedGroups = req.user.scope === 'university'
+    ? groups
+    : groups.filter(g => allowedFacultyIds.includes(g.faculty));
+  const allowedGroupCodes = allowedGroups.map(g => g.code);
+
+  const journals = journalsData?.journals || {};
+  const result = [];
+
+  Object.keys(journals).forEach(function(groupCode) {
+    if (!allowedGroupCodes.includes(groupCode)) return;
+    Object.keys(journals[groupCode]).forEach(function(subject) {
+      const journal = journals[groupCode][subject];
+      const teacher = users.find(u => u.id === journal.teacherId);
+
+      let totalMarks = 0, nCount = 0, sCount = 0, gradesCount = 0, gradesSum = 0;
+      Object.values(journal.students || {}).forEach(function(marks) {
+        Object.values(marks).forEach(function(m) {
+          totalMarks++;
+          if (m === 'Н') nCount++;
+          else if (m === 'С') sCount++;
+          else { gradesCount++; gradesSum += parseInt(m); }
+        });
+      });
+
+      result.push({
+        group: groupCode,
+        subject: subject,
+        teacherId: journal.teacherId,
+        teacherName: teacher?.fullName || 'Неизвестный',
+        semester: journal.semester || '—',
+        studentsCount: Object.keys(journal.students || {}).length,
+        totalMarks,
+        nCount,
+        sCount,
+        avgGrade: gradesCount ? (gradesSum / gradesCount).toFixed(2) : null
+      });
+    });
+  });
+
+  result.sort((a, b) => (a.group + a.subject).localeCompare(b.group + b.subject));
+  res.json(result);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
