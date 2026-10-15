@@ -664,6 +664,7 @@
       <span class='text'>СКФУ</span>
     </div>
     <div class='user-info'>
+      <span id='me-group' class='group'></span>
       <button id='inbox-btn' class='hidden icon-btn' title='Входящие'>
         <svg class='icon-svg' viewBox='0 0 24 24'><path d='M3 8l9 6 9-6'/><rect x='3' y='5' width='18' height='14' rx='2'/></svg>
       </button>
@@ -1022,8 +1023,13 @@ async function renderCurrentTab() {
         break;
       case 'teacher-schedule': await renderTeacherSchedule(); break;
       case 'my-subjects':
-        if (state.user.role === 'admin' && state.user.scope === 'faculty') await renderTeacherSubjects();
-        else main.innerHTML = '<div class="empty">Раздел доступен только декану</div>';
+        if (state.user.role === 'teacher'
+            || state.user.role === 'curator'
+            || (state.user.role === 'admin' && state.user.scope === 'faculty')) {
+          await renderTeacherSubjects();
+        } else {
+          main.innerHTML = '<div class="empty">Раздел доступен только преподавателю и декану</div>';
+        }
         break;
       case 'journal': await renderJournalReadOnly(); break;
       case 'stats': await renderStats(); break;
