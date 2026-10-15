@@ -3517,7 +3517,7 @@ async function renderAdminJournals() {
     el('span', { class: 'badge badge-editable', text: journals.length + ' шт.' })
   ]));
 
-  // === ПОИСК И ФИЛЬТРЫ ===
+  // === ПОИСК + ФИЛЬТР ПО ФАКУЛЬТЕТУ ===
   var filterRow = el('div', { class: 'filter-row' });
 
   var searchInput = el('input', {
@@ -3525,49 +3525,31 @@ async function renderAdminJournals() {
     placeholder: 'Поиск: группа, предмет, преподаватель'
   });
 
-  // Собираем уникальные факультеты, группы и преподавателей из данных
-  var faculties = {}, groups = {}, teachers = {};
+  // Уникальные факультеты из данных
+  var faculties = {};
   journals.forEach(function(j) {
     if (j.facultyName) faculties[j.facultyName] = true;
-    if (j.group) groups[j.group] = true;
-    if (j.teacherName) teachers[j.teacherName] = true;
   });
 
   var facultySelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
     Object.keys(faculties).sort().map(function(f) { return el('option', { value: f, text: f }); })
   ));
 
-  var groupSelect = el('select', {}, [el('option', { value: '', text: 'Все группы' })].concat(
-    Object.keys(groups).sort().map(function(g) { return el('option', { value: g, text: g }); })
-  ));
-
-  var teacherSelect = el('select', {}, [el('option', { value: '', text: 'Все преподаватели' })].concat(
-    Object.keys(teachers).sort().map(function(t) { return el('option', { value: t, text: t }); })
-  ));
-
   filterRow.appendChild(searchInput);
   filterRow.appendChild(facultySelect);
-  filterRow.appendChild(groupSelect);
-  filterRow.appendChild(teacherSelect);
   head.appendChild(filterRow);
   main.appendChild(head);
 
-  // Контейнер, куда рендерим отфильтрованный список
   var listContainer = el('div');
   main.appendChild(listContainer);
 
-  // Функция рендера списка с учётом фильтров
   function renderList() {
     listContainer.innerHTML = '';
     var q = searchInput.value.trim().toLowerCase();
     var fFac = facultySelect.value;
-    var fGrp = groupSelect.value;
-    var fTch = teacherSelect.value;
 
     var filtered = journals.filter(function(j) {
       if (fFac && j.facultyName !== fFac) return false;
-      if (fGrp && j.group !== fGrp) return false;
-      if (fTch && j.teacherName !== fTch) return false;
       if (q) {
         var hay = (j.group + ' ' + j.subject + ' ' + (j.teacherName || '') + ' ' + (j.facultyName || '')).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -3615,13 +3597,8 @@ async function renderAdminJournals() {
     });
   }
 
-  // Навешиваем обработчики
   searchInput.addEventListener('input', renderList);
   facultySelect.addEventListener('change', renderList);
-  groupSelect.addEventListener('change', renderList);
-  teacherSelect.addEventListener('change', renderList);
-
-  // Первый рендер
   renderList();
 }
 
