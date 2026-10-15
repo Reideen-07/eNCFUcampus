@@ -664,7 +664,6 @@
       <span class='text'>СКФУ</span>
     </div>
     <div class='user-info'>
-      <span id='me-group' class='group'></span>
       <button id='inbox-btn' class='hidden icon-btn' title='Входящие'>
         <svg class='icon-svg' viewBox='0 0 24 24'><path d='M3 8l9 6 9-6'/><rect x='3' y='5' width='18' height='14' rx='2'/></svg>
       </button>
@@ -3517,46 +3516,113 @@ async function renderAdminJournals() {
     'Все журналы',
     el('span', { class: 'badge badge-editable', text: journals.length + ' шт.' })
   ]));
+
+  // === ПОИСК И ФИЛЬТРЫ ===
+  var filterRow = el('div', { class: 'filter-row' });
+
+  var searchInput = el('input', {
+    type: 'text',
+    placeholder: 'Поиск: группа, предмет, преподаватель'
+  });
+
+  // Собираем уникальные факультеты, группы и преподавателей из данных
+  var faculties = {}, groups = {}, teachers = {};
+  journals.forEach(function(j) {
+    if (j.facultyName) faculties[j.facultyName] = true;
+    if (j.group) groups[j.group] = true;
+    if (j.teacherName) teachers[j.teacherName] = true;
+  });
+
+  var facultySelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
+    Object.keys(faculties).sort().map(function(f) { return el('option', { value: f, text: f }); })
+  ));
+
+  var groupSelect = el('select', {}, [el('option', { value: '', text: 'Все группы' })].concat(
+    Object.keys(groups).sort().map(function(g) { return el('option', { value: g, text: g }); })
+  ));
+
+  var teacherSelect = el('select', {}, [el('option', { value: '', text: 'Все преподаватели' })].concat(
+    Object.keys(teachers).sort().map(function(t) { return el('option', { value: t, text: t }); })
+  ));
+
+  filterRow.appendChild(searchInput);
+  filterRow.appendChild(facultySelect);
+  filterRow.appendChild(groupSelect);
+  filterRow.appendChild(teacherSelect);
+  head.appendChild(filterRow);
   main.appendChild(head);
 
-  if (!journals.length) {
-    main.appendChild(el('div', { class: 'group' }, [
-      el('div', { class: 'empty', text: 'Журналов пока нет' })
-    ]));
-    return;
+  // Контейнер, куда рендерим отфильтрованный список
+  var listContainer = el('div');
+  main.appendChild(listContainer);
+
+  // Функция рендера списка с учётом фильтров
+  function renderList() {
+    listContainer.innerHTML = '';
+    var q = searchInput.value.trim().toLowerCase();
+    var fFac = facultySelect.value;
+    var fGrp = groupSelect.value;
+    var fTch = teacherSelect.value;
+
+    var filtered = journals.filter(function(j) {
+      if (fFac && j.facultyName !== fFac) return false;
+      if (fGrp && j.group !== fGrp) return false;
+      if (fTch && j.teacherName !== fTch) return false;
+      if (q) {
+        var hay = (j.group + ' ' + j.subject + ' ' + (j.teacherName || '') + ' ' + (j.facultyName || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      listContainer.appendChild(el('div', { class: 'group' }, [
+        el('div', { class: 'empty', text: 'Ничего не найдено' })
+      ]));
+      return;
+    }
+
+    // Группируем по группам
+    var byGroup = {};
+    filtered.forEach(function(j) {
+      if (!byGroup[j.group]) byGroup[j.group] = [];
+      byGroup[j.group].push(j);
+    });
+
+    Object.keys(byGroup).sort().forEach(function(groupCode) {
+      var block = el('div', { class: 'group' });
+      block.appendChild(el('div', { class: 'group-header' }, [
+        groupCode,
+        el('span', { class: 'badge badge-readonly', text: byGroup[groupCode].length + ' журн.' })
+      ]));
+
+      byGroup[groupCode].forEach(function(j) {
+        block.appendChild(el('div', { class: 'row clickable', onclick: function() {
+          openAdminJournal(j.group, j.subject);
+        }}, [
+          el('div', { style: 'flex: 1; min-width: 0;' }, [
+            el('div', { style: 'font-weight: 600; font-size: 15px;', text: j.subject }),
+            el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: j.teacherName + ' · ' + j.studentsCount + ' студ.' })
+          ]),
+          el('div', { style: 'display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;' }, [
+            j.nCount > 0 ? el('span', { style: 'font-size: 11px; color: var(--red); font-weight: 600;', text: j.nCount + ' Н' }) : null,
+            j.avgGrade ? el('span', { style: 'font-size: 11px; color: var(--accent); font-weight: 600;', text: 'ср. ' + j.avgGrade }) : null
+          ]),
+          el('div', { class: 'chevron', text: '›' })
+        ]));
+      });
+      listContainer.appendChild(block);
+    });
   }
 
-  // Группируем по группам
-  var byGroup = {};
-  journals.forEach(function(j) {
-    if (!byGroup[j.group]) byGroup[j.group] = [];
-    byGroup[j.group].push(j);
-  });
+  // Навешиваем обработчики
+  searchInput.addEventListener('input', renderList);
+  facultySelect.addEventListener('change', renderList);
+  groupSelect.addEventListener('change', renderList);
+  teacherSelect.addEventListener('change', renderList);
 
-  Object.keys(byGroup).sort().forEach(function(groupCode) {
-    var block = el('div', { class: 'group' });
-    block.appendChild(el('div', { class: 'group-header' }, [
-      groupCode,
-      el('span', { class: 'badge badge-readonly', text: byGroup[groupCode].length + ' журн.' })
-    ]));
-
-    byGroup[groupCode].forEach(function(j) {
-      block.appendChild(el('div', { class: 'row clickable', onclick: function() {
-        openAdminJournal(j.group, j.subject);
-      }}, [
-        el('div', { style: 'flex: 1; min-width: 0;' }, [
-          el('div', { style: 'font-weight: 600; font-size: 15px;', text: j.subject }),
-          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: j.teacherName + ' · ' + j.studentsCount + ' студ.' })
-        ]),
-        el('div', { style: 'display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;' }, [
-          j.nCount > 0 ? el('span', { style: 'font-size: 11px; color: var(--red); font-weight: 600;', text: j.nCount + ' Н' }) : null,
-          j.avgGrade ? el('span', { style: 'font-size: 11px; color: var(--accent); font-weight: 600;', text: 'ср. ' + j.avgGrade }) : null
-        ]),
-        el('div', { class: 'chevron', text: '›' })
-      ]));
-    });
-    main.appendChild(block);
-  });
+  // Первый рендер
+  renderList();
 }
 
 async function openAdminJournal(groupCode, subject) {
@@ -3712,13 +3778,6 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
 async function enterApp() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
-
-  var roleLabel = state.user.group || (state.user.role === 'teacher' ? 'Преподаватель' : '');
-  if (state.user.role === 'admin') {
-    roleLabel = state.user.scope === 'university' ? 'Ректор' : 'Декан';
-  }
-  const meGroupEl = document.getElementById('me-group');
-  if (meGroupEl) meGroupEl.textContent = roleLabel;
 
   buildTabBar();
   var tabs = getTabs();
