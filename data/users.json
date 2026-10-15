@@ -72,7 +72,11 @@
       "bio": "",
       "status": "active",
       "joinedAt": "2025-09-01",
-      "socials": []
+      "socials": [],
+
+      "isForeign": true,
+      "registrationUntil": "2026-11-01",
+      "visaUntil": "2026-12-15"
     },
     {
       "id": "u3",
