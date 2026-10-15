@@ -1003,6 +1003,37 @@
       "status": "active",
       "joinedAt": "2023-09-01",
       "socials": []
+    },
+        {
+      "id": "u50",
+      "login": "dekan",
+      "password": "1234",
+      "fullName": "Гровать Татьяна Анатольевна",
+      "role": "admin",
+      "scope": "faculty",
+      "facultyId": "fmkn",
+      "email": "dean@ncfu.ru",
+      "birthday": "1970-05-12",
+      "photoUrl": null,
+      "bio": "Декан факультета математики и компьютерных наук",
+      "status": "active",
+      "joinedAt": "2015-09-01",
+      "socials": []
+    },
+    {
+      "id": "u51",
+      "login": "rector",
+      "password": "1234",
+      "fullName": "Шебзухова Татьяна Александровна",
+      "role": "admin",
+      "scope": "university",
+      "email": "rector@ncfu.ru",
+      "birthday": "1965-03-20",
+      "photoUrl": null,
+      "bio": "Ректор СКФУ",
+      "status": "active",
+      "joinedAt": "2010-09-01",
+      "socials": []
     }
   ]
 }
