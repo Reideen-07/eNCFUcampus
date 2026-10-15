@@ -919,7 +919,38 @@ var TABS_CURATOR = [
   { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
 ];
 
+var TABS_ADMIN = [
+  // Декан ведёт пары — у него есть преподавательские вкладки
+  // Ректор пар не ведёт — у него их нет.
+  // Поэтому вкладки будут генерироваться динамически в getTabs()
+];
+
 function getTabs() {
+  if (state.user.role === 'admin') {
+    var tabs = [];
+
+    // Декан (scope=faculty) ведёт пары — добавляем преподательские вкладки
+    if (state.user.scope === 'faculty') {
+      tabs.push(
+        { key: 'home', label: t('home'), title: 'Главная', subtitle: 'Расписание на сегодня', accent: 'var(--tab-accent-home)', icon: 'home' },
+        { key: 'schedule', label: t('schedule'), title: 'Расписание', subtitle: 'Моё расписание', accent: 'var(--tab-accent-events)', icon: 'calendar' },
+        { key: 'my-subjects', label: 'Предметы', title: 'Мои предметы', subtitle: 'По типам и группам', accent: 'var(--tab-accent-journal)', icon: 'journal' }
+      );
+    }
+
+    // Общие админ-вкладки (для обоих)
+    tabs.push(
+      { key: 'admin-overview', label: 'Обзор', title: 'Обзор', subtitle: state.user.scope === 'university' ? 'Весь вуз' : 'Мой факультет', accent: 'var(--tab-accent-starostas)', icon: 'chart' },
+      { key: 'admin-groups', label: 'Группы', title: 'Группы', subtitle: state.user.scope === 'university' ? 'Все группы' : 'Группы факультета', accent: 'var(--tab-accent-home)', icon: 'list' },
+      { key: 'admin-students', label: 'Студенты', title: 'Студенты', subtitle: 'Сводка', accent: 'var(--tab-accent-home)', icon: 'people' },
+      { key: 'admin-teachers', label: 'Преподаватели', title: 'Преподаватели', subtitle: 'Сводка', accent: 'var(--tab-accent-journal)', icon: 'user' },
+      { key: 'admin-journals', label: 'Журналы', title: 'Журналы', subtitle: 'Все журналы', accent: 'var(--tab-accent-events)', icon: 'journal' },
+      { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+    );
+
+    return tabs;
+  }
+
   if (state.user.role === 'curator') return TABS_CURATOR;
   if (state.user.role === 'teacher') return TABS_TEACHER;
   if (state.user.role === 'starosta') return TABS_STAROSTA;
@@ -978,14 +1009,22 @@ async function renderCurrentTab() {
     switch (state.currentTab) {
       case 'home':
         if (state.user.role === 'student' || state.user.role === 'starosta') await renderHome();
-        else await renderHomeForTeacher(); // teacher И curator
+        else if (state.user.role === 'admin' && state.user.scope === 'faculty') await renderHomeForTeacher();
+        else if (state.user.role === 'admin') main.innerHTML = '<div class="empty">Раздел недоступен</div>';
+        else await renderHomeForTeacher();
         break;
       case 'schedule':
-        if (state.user.role === 'teacher' || state.user.role === 'curator') await renderTeacherScheduleForSelf();
-        else await renderSchedule();
+        if (state.user.role === 'teacher' || state.user.role === 'curator' || (state.user.role === 'admin' && state.user.scope === 'faculty')) {
+          await renderTeacherScheduleForSelf();
+        } else {
+          await renderSchedule();
+        }
         break;
       case 'teacher-schedule': await renderTeacherSchedule(); break;
-      case 'my-subjects': await renderTeacherSubjects(); break;
+      case 'my-subjects':
+        if (state.user.role === 'admin' && state.user.scope === 'faculty') await renderTeacherSubjects();
+        else main.innerHTML = '<div class="empty">Раздел доступен только декану</div>';
+        break;
       case 'journal': await renderJournalReadOnly(); break;
       case 'stats': await renderStats(); break;
       case 'search': await renderSearchSchedule(); break;
@@ -1003,6 +1042,11 @@ async function renderCurrentTab() {
       case 'curator-journals': await renderCuratorJournals(); break;
       case 'curator-students': await renderCuratorStudents(); break;
       case 'curator-student-detail': await renderCuratorStudentDetail(); break;
+      case 'admin-overview': await renderAdminOverview(); break;
+      case 'admin-groups': await renderAdminGroups(); break;
+      case 'admin-students': await renderAdminStudents(); break;
+      case 'admin-teachers': await renderAdminTeachers(); break;
+      case 'admin-journals': await renderAdminJournals(); break;
       default: main.innerHTML = '<div class="empty">Раздел в разработке</div>';
     }
   } catch (e) { main.innerHTML = '<div class="group"><div class="empty">' + escapeHtml(e.message) + '</div></div>'; }
@@ -3212,6 +3256,374 @@ async function renderCuratorStudentDetail() {
   main.appendChild(back);
 }
 
+// ============================================================
+//  АДМИН: ОБЗОР
+// ============================================================
+async function renderAdminOverview() {
+  main.innerHTML = '';
+  var data = await api('/api/admin/overview');
+
+  var isRector = data.scope === 'university';
+  var scopeLabel = isRector ? 'Весь вуз' : 'Мой факультет';
+
+  // Hero
+  var hero = el('div', { class: 'hero-card' }, [
+    el('div', { class: 'lbl', text: isRector ? 'РЕКТОР' : 'ДЕКАН' }),
+    el('div', { class: 'big', text: state.user.fullName.split(' ')[0], style: 'font-size: 48px;' }),
+    el('div', { class: 'sub', text: scopeLabel })
+  ]);
+  main.appendChild(hero);
+
+  // Сетка цифр
+  var grid = el('div', { class: 'group' });
+  grid.appendChild(el('div', { class: 'group-header', text: 'Общая статистика' }));
+
+  var stats = [
+    { label: 'Факультеты', value: data.faculties, icon: '🏛️', color: 'var(--indigo)' },
+    { label: 'Группы', value: data.groups, icon: '📚', color: 'var(--accent)' },
+    { label: 'Студенты', value: data.students, icon: '🎓', color: 'var(--green)' },
+    { label: 'Преподаватели', value: data.teachers, icon: '👨‍🏫', color: 'var(--orange)' },
+    { label: 'Кураторы', value: data.curators, icon: '🎯', color: 'var(--purple)' },
+    { label: 'Старосты', value: data.starostas, icon: '👥', color: 'var(--indigo)' },
+    { label: 'Журналы', value: data.journals, icon: '📓', color: 'var(--accent)' },
+    { label: 'Объявления', value: data.announcements, icon: '📢', color: 'var(--red)' }
+  ];
+
+  var statsGrid = el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 16px 20px;' });
+  stats.forEach(function(s) {
+    statsGrid.appendChild(el('div', { style: 'background: var(--gray-bg); border-radius: 16px; padding: 14px; text-align: center;' }, [
+      el('div', { style: 'font-size: 24px; margin-bottom: 4px;', text: s.icon }),
+      el('div', { style: 'font-size: 28px; font-weight: 700; color: ' + s.color + ';', text: String(s.value) }),
+      el('div', { style: 'font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-top: 2px;', text: s.label })
+    ]));
+  });
+  grid.appendChild(statsGrid);
+  main.appendChild(grid);
+}
+
+// ============================================================
+//  АДМИН: ГРУППЫ
+// ============================================================
+async function renderAdminGroups() {
+  main.innerHTML = '';
+  var groups = await api('/api/admin/groups');
+
+  if (!groups.length) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'Групп не найдено' })
+    ]));
+    return;
+  }
+
+  // Группируем по факультету
+  var byFaculty = {};
+  groups.forEach(function(g) {
+    var key = g.facultyName || 'Без факультета';
+    if (!byFaculty[key]) byFaculty[key] = [];
+    byFaculty[key].push(g);
+  });
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Группы',
+    el('span', { class: 'badge badge-editable', text: groups.length + ' шт.' })
+  ]));
+  main.appendChild(head);
+
+  Object.keys(byFaculty).sort().forEach(function(fac) {
+    var block = el('div', { class: 'group' });
+    block.appendChild(el('div', { class: 'group-header' }, [
+      fac,
+      el('span', { class: 'badge badge-readonly', text: byFaculty[fac].length + ' групп' })
+    ]));
+    byFaculty[fac].forEach(function(g) {
+      block.appendChild(el('div', { class: 'row clickable', onclick: function() {
+        // Показываем студентов группы
+        openAdminGroupDetail(g);
+      }}, [
+        el('div', { style: 'flex: 1; min-width: 0;' }, [
+          el('div', { style: 'font-weight: 600; font-size: 15px;', text: g.code }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: g.name || '' })
+        ]),
+        el('div', { style: 'display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;' }, [
+          el('span', { style: 'font-size: 12px; font-weight: 600;', text: g.studentsCount + ' студ.' }),
+          g.course ? el('span', { style: 'font-size: 11px; color: var(--text-secondary);', text: g.course + ' курс' }) : null
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]));
+    });
+    main.appendChild(block);
+  });
+}
+
+function openAdminGroupDetail(g) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+
+  api('/api/groups/' + encodeURIComponent(g.code) + '/official').then(function(list) {
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [
+      el('h3', { text: g.code }),
+      el('p', { text: g.name + ' · ' + list.length + ' студентов' })
+    ]));
+
+    var info = el('div', { style: 'padding: 8px 16px; border-bottom: 1px solid var(--separator);' });
+    if (g.starostaName) info.appendChild(el('div', { style: 'font-size: 13px; padding: 4px 0;' }, [
+      el('span', { style: 'color: var(--text-secondary);', text: 'Староста: ' }),
+      el('span', { style: 'font-weight: 600;', text: g.starostaName })
+    ]));
+    if (g.curatorName) info.appendChild(el('div', { style: 'font-size: 13px; padding: 4px 0;' }, [
+      el('span', { style: 'color: var(--text-secondary);', text: 'Куратор: ' }),
+      el('span', { style: 'font-weight: 600;', text: g.curatorName })
+    ]));
+    pop.appendChild(info);
+
+    list.forEach(function(s, idx) {
+      var row = el('div', { class: 'popover-item' }, [
+        el('div', { class: 'idx', style: 'width: 30px; height: 30px; border-radius: 50%; background: var(--gray-bg); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;', text: String(idx + 1) }),
+        el('div', { class: 'label' }, [
+          el('div', { style: 'font-size: 14px; font-weight: 500;', text: s.fullName }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary);', text: 'Зачётка: ' + (s.zachetka || '—') })
+        ])
+      ]);
+      if (s.userId) {
+        row.addEventListener('click', function() {
+          overlay.remove();
+          openUserProfile(s.userId);
+        });
+        row.style.cursor = 'pointer';
+      }
+      pop.appendChild(row);
+    });
+  }).catch(function(e) {
+    pop.innerHTML = '<div class="empty">' + e.message + '</div>';
+  });
+}
+
+// ============================================================
+//  АДМИН: СТУДЕНТЫ
+// ============================================================
+async function renderAdminStudents() {
+  main.innerHTML = '';
+  var students = await api('/api/admin/students');
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Студенты',
+    el('span', { class: 'badge badge-editable', text: students.length + ' чел.' })
+  ]));
+
+  // Поиск
+  var searchRow = el('div', { class: 'filter-row' });
+  var searchInput = el('input', { type: 'text', placeholder: 'Поиск по ФИО или группе' });
+  searchRow.appendChild(searchInput);
+  head.appendChild(searchRow);
+  main.appendChild(head);
+
+  var listBlock = el('div', { class: 'group' });
+  main.appendChild(listBlock);
+
+  function render(filter) {
+    listBlock.innerHTML = '';
+    var q = (filter || '').toLowerCase();
+    var filtered = students.filter(function(s) {
+      if (!q) return true;
+      return (s.fullName + ' ' + s.group).toLowerCase().indexOf(q) !== -1;
+    });
+    if (!filtered.length) {
+      listBlock.appendChild(el('div', { class: 'empty', text: 'Никого не найдено' }));
+      return;
+    }
+    filtered.forEach(function(s) {
+      listBlock.appendChild(el('div', { class: 'row clickable', onclick: function() { openUserProfile(s.id); } }, [
+        el('div', { style: 'flex: 1; min-width: 0;' }, [
+          el('div', { style: 'font-weight: 500; font-size: 15px;' }, [
+            s.individualPlan ? el('span', { style: 'color: var(--accent); font-weight: 700; margin-right: 6px;', text: '★' }) : null,
+            el('span', { text: s.fullName })
+          ]),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: s.group })
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]));
+    });
+  }
+  render('');
+  searchInput.addEventListener('input', function() { render(searchInput.value); });
+}
+
+// ============================================================
+//  АДМИН: ПРЕПОДАВАТЕЛИ
+// ============================================================
+async function renderAdminTeachers() {
+  main.innerHTML = '';
+  var teachers = await api('/api/admin/teachers');
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Преподаватели',
+    el('span', { class: 'badge badge-editable', text: teachers.length + ' чел.' })
+  ]));
+  var searchRow = el('div', { class: 'filter-row' });
+  var searchInput = el('input', { type: 'text', placeholder: 'Поиск по ФИО' });
+  searchRow.appendChild(searchInput);
+  head.appendChild(searchRow);
+  main.appendChild(head);
+
+  var listBlock = el('div', { class: 'group' });
+  main.appendChild(listBlock);
+
+  function render(filter) {
+    listBlock.innerHTML = '';
+    var q = (filter || '').toLowerCase();
+    var filtered = teachers.filter(function(t) {
+      if (!q) return true;
+      return t.fullName.toLowerCase().indexOf(q) !== -1;
+    });
+    if (!filtered.length) {
+      listBlock.appendChild(el('div', { class: 'empty', text: 'Никого не найдено' }));
+      return;
+    }
+    filtered.forEach(function(t) {
+      listBlock.appendChild(el('div', { class: 'row clickable', onclick: function() { openUserProfile(t.id); } }, [
+        avatarNode(t, 'sm'),
+        el('div', { style: 'flex: 1; min-width: 0; margin-left: 8px;' }, [
+          el('div', { style: 'font-weight: 500; font-size: 15px;', text: t.fullName }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: (t.role === 'curator' ? 'Куратор · ' : '') + (t.facultyName || '') + (t.groups.length ? ' · ' + t.groups.length + ' групп' : '') })
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]));
+    });
+  }
+  render('');
+  searchInput.addEventListener('input', function() { render(searchInput.value); });
+}
+
+// ============================================================
+//  АДМИН: ЖУРНАЛЫ
+// ============================================================
+async function renderAdminJournals() {
+  main.innerHTML = '';
+  var journals = await api('/api/admin/journals');
+
+  var head = el('div', { class: 'group' });
+  head.appendChild(el('div', { class: 'group-header' }, [
+    'Все журналы',
+    el('span', { class: 'badge badge-editable', text: journals.length + ' шт.' })
+  ]));
+  main.appendChild(head);
+
+  if (!journals.length) {
+    main.appendChild(el('div', { class: 'group' }, [
+      el('div', { class: 'empty', text: 'Журналов пока нет' })
+    ]));
+    return;
+  }
+
+  // Группируем по группам
+  var byGroup = {};
+  journals.forEach(function(j) {
+    if (!byGroup[j.group]) byGroup[j.group] = [];
+    byGroup[j.group].push(j);
+  });
+
+  Object.keys(byGroup).sort().forEach(function(groupCode) {
+    var block = el('div', { class: 'group' });
+    block.appendChild(el('div', { class: 'group-header' }, [
+      groupCode,
+      el('span', { class: 'badge badge-readonly', text: byGroup[groupCode].length + ' журн.' })
+    ]));
+
+    byGroup[groupCode].forEach(function(j) {
+      block.appendChild(el('div', { class: 'row clickable', onclick: function() {
+        openAdminJournal(j.group, j.subject);
+      }}, [
+        el('div', { style: 'flex: 1; min-width: 0;' }, [
+          el('div', { style: 'font-weight: 600; font-size: 15px;', text: j.subject }),
+          el('div', { style: 'font-size: 12px; color: var(--text-secondary); margin-top: 2px;', text: j.teacherName + ' · ' + j.studentsCount + ' студ.' })
+        ]),
+        el('div', { style: 'display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;' }, [
+          j.nCount > 0 ? el('span', { style: 'font-size: 11px; color: var(--red); font-weight: 600;', text: j.nCount + ' Н' }) : null,
+          j.avgGrade ? el('span', { style: 'font-size: 11px; color: var(--accent); font-weight: 600;', text: 'ср. ' + j.avgGrade }) : null
+        ]),
+        el('div', { class: 'chevron', text: '›' })
+      ]));
+    });
+    main.appendChild(block);
+  });
+}
+
+async function openAdminJournal(groupCode, subject) {
+  var overlay = openOverlay();
+  var pop = overlay.querySelector('.popover');
+  pop.style.minWidth = '90vw';
+  pop.style.maxWidth = '900px';
+  pop.innerHTML = '<div class="empty">Загрузка...</div>';
+
+  try {
+    var data = await api('/api/admin/journal?group=' + encodeURIComponent(groupCode) + '&subject=' + encodeURIComponent(subject));
+    pop.innerHTML = '';
+    pop.appendChild(el('div', { class: 'popover-header' }, [
+      el('h3', { text: subject }),
+      el('p', { text: groupCode + ' · ' + data.teacherName + ' · семестр ' + data.semester })
+    ]));
+
+    if (!data.dates.length) {
+      pop.appendChild(el('div', { class: 'empty', text: 'В журнале пока нет отметок' }));
+      return;
+    }
+
+    // Информационная плашка
+    var infoRow = el('div', { style: 'padding: 8px 16px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--separator);' }, [
+      el('span', { text: 'Студентов: ' + data.students.length + ' · Пар: ' + data.dates.length })
+    ]);
+    pop.appendChild(infoRow);
+
+    // Таблица
+    var wrapper = el('div', { class: 'journal-wrapper' });
+    var theadRow = el('tr', {});
+    theadRow.appendChild(el('th', { class: 'name-col', text: 'Студент' }));
+    data.dates.forEach(function(d) {
+      var dd = new Date(d + 'T00:00:00');
+      var weekdays = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+      theadRow.appendChild(el('th', { class: 'date-cell' }, [
+        el('div', { class: 'weekday', text: weekdays[dd.getDay()] }),
+        el('div', { class: 'day', text: d.slice(8, 10) + '.' + d.slice(5, 7) })
+      ]));
+    });
+
+    var tbody = el('tbody', {});
+    data.students.forEach(function(s) {
+      var tr = el('tr', {});
+      var colorMap = { none: 'var(--text)', yellow: '#ffcc00', orange: 'var(--orange)', red: 'var(--red)' };
+      var nameColor = colorMap[s.colorLevel] || 'var(--text)';
+
+      var nameCell = el('td', { class: 'name-col' });
+      if (s.individualPlan) nameCell.appendChild(el('span', { style: 'color: var(--accent); font-weight:700; margin-right: 6px;', text: '★' }));
+      nameCell.appendChild(el('span', { style: 'color: ' + nameColor + '; font-weight: 600;', text: s.fullName }));
+      if (s.nCount > 0) nameCell.appendChild(el('span', { style: 'font-size: 11px; margin-left: 6px; padding: 1px 6px; border-radius: 100px; background: ' + nameColor + '20; color: ' + nameColor + '; font-weight: 700;', text: s.nCount + 'Н' }));
+      tr.appendChild(nameCell);
+
+      data.dates.forEach(function(d) {
+        var mark = (s.marks || {})[d] || '';
+        var td = el('td', { class: 'att-cell readonly' });
+        if (mark) {
+          var cls = mark === 'Н' ? 'absent' : (mark === 'С' ? 'drone' : 'grade-' + mark);
+          td.appendChild(el('span', { class: 'status-badge ' + cls, text: mark }));
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    wrapper.appendChild(el('table', { class: 'journal' }, [el('thead', {}, [theadRow]), tbody]));
+    pop.appendChild(wrapper);
+
+  } catch (e) {
+    pop.innerHTML = '<div class="empty">' + escapeHtml(e.message) + '</div>';
+  }
+}
+
 async function renderSettings() {
   main.innerHTML = '';
   var currentTheme = localStorage.getItem('theme') || 'system';
@@ -3294,9 +3706,24 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
 async function enterApp() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app-screen').classList.remove('hidden');
+
+  var roleLabel = state.user.group || (state.user.role === 'teacher' ? 'Преподаватель' : '');
+  if (state.user.role === 'admin') {
+    roleLabel = state.user.scope === 'university' ? 'Ректор' : 'Декан';
+  }
+  document.getElementById('me-group').textContent = roleLabel;
+
   buildTabBar();
   var tabs = getTabs();
-  switchTab(tabs[0].key);
+
+  // Админу сразу открываем "Обзор"
+  if (state.user.role === 'admin') {
+    var adminTab = tabs.find(t => t.key === 'admin-overview');
+    switchTab(adminTab ? adminTab.key : tabs[0].key);
+  } else {
+    switchTab(tabs[0].key);
+  }
+
   if (state.user.role === 'teacher' || state.user.role === 'curator') {
     document.getElementById('inbox-btn').classList.remove('hidden');
   }
