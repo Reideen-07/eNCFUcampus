@@ -3711,7 +3711,8 @@ async function enterApp() {
   if (state.user.role === 'admin') {
     roleLabel = state.user.scope === 'university' ? 'Ректор' : 'Декан';
   }
-  document.getElementById('me-group').textContent = roleLabel;
+  const meGroupEl = document.getElementById('me-group');
+  if (meGroupEl) meGroupEl.textContent = roleLabel;
 
   buildTabBar();
   var tabs = getTabs();
