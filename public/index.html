@@ -3372,8 +3372,7 @@ async function renderAdminOverview() {
     { label: 'Преподаватели', value: data.teachers, icon: '👨‍🏫', color: 'var(--orange)' },
     { label: 'Кураторы', value: data.curators, icon: '🎯', color: 'var(--purple)' },
     { label: 'Старосты', value: data.starostas, icon: '👥', color: 'var(--indigo)' },
-    { label: 'Журналы', value: data.journals, icon: '📓', color: 'var(--accent)' },
-    { label: 'Объявления', value: data.announcements, icon: '📢', color: 'var(--red)' }
+    { label: 'Журналы', value: data.journals, icon: '📓', color: 'var(--accent)' }
   ];
 
 var statsGrid = el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 16px 20px;' });
@@ -3560,7 +3559,7 @@ async function renderAdminStudents() {
     var q = (searchInput.value || '').trim().toLowerCase();
     var fac = facSelect.value;
 
-    var filtered = teachers.filter(function(t) {
+    var filtered = students.filter(function(t) {
       if (fac) {
         var key = t.facultyId || t.facultyName;
         if (key !== fac) return false;
@@ -3613,9 +3612,9 @@ async function renderAdminTeachers() {
 
   // Селект факультета — собираем из преподавателей
   var facMap = {};
-  teachers.forEach(function(t) {
-    var key = t.facultyId || t.facultyName;
-    if (key) facMap[key] = t.facultyName || t.facultyId;
+  teachers.forEach(function(s) {
+    var key = s.facultyId || s.facultyName;
+    if (key) facMap[key] = s.facultyName || s.facultyId;
   });
   var facSelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
     Object.keys(facMap).sort(function(a, b) {
@@ -3633,15 +3632,26 @@ async function renderAdminTeachers() {
   var listBlock = el('div', { class: 'group' });
   main.appendChild(listBlock);
 
-  function render(filter) {
+  function render() {
     listBlock.innerHTML = '';
-    var q = (filter || '').toLowerCase();
+    var q = (searchInput.value || '').trim().toLowerCase();
+    var fac = facSelect.value;
+
     var filtered = teachers.filter(function(t) {
-      if (!q) return true;
-      return t.fullName.toLowerCase().indexOf(q) !== -1;
+      if (fac) {
+        var key = t.facultyId || t.facultyName;
+        if (key !== fac) return false;
+      }
+      if (q) {
+        if (t.fullName.toLowerCase().indexOf(q) === -1) return false;
+      }
+      return true;
     });
+
     if (!filtered.length) {
-      listBlock.appendChild(el('div', { class: 'empty', text: 'Никого не найдено' }));
+      listBlock.appendChild(el('div', { class: 'group' }, [
+        el('div', { class: 'empty', text: 'Никого не найдено' })
+      ]));
       return;
     }
     filtered.forEach(function(t) {
