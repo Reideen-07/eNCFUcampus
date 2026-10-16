@@ -3523,12 +3523,11 @@ async function renderAdminStudents() {
     el('span', { class: 'badge badge-editable', text: students.length + ' чел.' })
   ]));
 
-  // Поиск
-  var faculties = await api('/api/faculties');   // если маршрут есть
+  // === Поиск + фильтр по факультету ===
   var filterRow = el('div', { class: 'filter-row' });
   var searchInput = el('input', { type: 'text', placeholder: 'Поиск по ФИО или группе' });
 
-  // Селект факультета. Собираем факультеты из самих студентов.
+  // Собираем факультеты из студентов
   var facMap = {};
   students.forEach(function(s) {
     var key = s.facultyId || s.facultyName;
@@ -3544,12 +3543,8 @@ async function renderAdminStudents() {
 
   filterRow.appendChild(searchInput);
   filterRow.appendChild(facSelect);
-  var facSelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
-    faculties.map(function(f) { return el('option', { value: f.id, text: f.shortName || f.name }); })
-  ));
-  filterRow.appendChild(searchInput);
-  filterRow.appendChild(facSelect);
   head.appendChild(filterRow);
+  main.appendChild(head);
 
   var listBlock = el('div', { class: 'group' });
   main.appendChild(listBlock);
@@ -3559,13 +3554,14 @@ async function renderAdminStudents() {
     var q = (searchInput.value || '').trim().toLowerCase();
     var fac = facSelect.value;
 
-    var filtered = students.filter(function(t) {
+    var filtered = students.filter(function(s) {
       if (fac) {
-        var key = t.facultyId || t.facultyName;
+        var key = s.facultyId || s.facultyName;
         if (key !== fac) return false;
       }
       if (q) {
-        if (t.fullName.toLowerCase().indexOf(q) === -1) return false;
+        var hay = (s.fullName + ' ' + (s.group || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
       }
       return true;
     });
@@ -3577,8 +3573,10 @@ async function renderAdminStudents() {
       return;
     }
 
-    filtered.forEach(function(t) {
-      listBlock.appendChild(el('div', { class: 'row clickable', onclick: function() { openUserProfile(s.id); } }, [
+    filtered.forEach(function(s) {
+      listBlock.appendChild(el('div', { class: 'row clickable', onclick: function() {
+        openUserProfile(s.id);
+      }}, [
         el('div', { style: 'flex: 1; min-width: 0;' }, [
           el('div', { style: 'font-weight: 500; font-size: 15px;' }, [
             s.individualPlan ? el('span', { style: 'color: var(--accent); font-weight: 700; margin-right: 6px;', text: '★' }) : null,
@@ -3590,9 +3588,10 @@ async function renderAdminStudents() {
       ]));
     });
   }
-  render();
+
   searchInput.addEventListener('input', render);
   facSelect.addEventListener('change', render);
+  render();
 }
 
 // ============================================================
