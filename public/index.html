@@ -1007,12 +1007,13 @@ function getTabs() {
 
     // Общие админ-вкладки (для обоих)
     tabs.push(
-      { key: 'admin-overview', label: 'Обзор', title: 'Обзор', subtitle: state.user.scope === 'university' ? 'Весь вуз' : 'Мой факультет', accent: 'var(--tab-accent-starostas)', icon: 'chart' },
+      { key: 'admin-overview', label: 'Данные', title: 'Данные', subtitle: state.user.scope === 'university' ? 'Весь вуз' : 'Мой факультет', accent: 'var(--tab-accent-starostas)', icon: 'chart' },
       { key: 'admin-groups', label: 'Группы', title: 'Группы', subtitle: state.user.scope === 'university' ? 'Все группы' : 'Группы факультета', accent: 'var(--tab-accent-home)', icon: 'list' },
       { key: 'admin-students', label: 'Студенты', title: 'Студенты', subtitle: 'Сводка', accent: 'var(--tab-accent-home)', icon: 'people' },
       { key: 'admin-teachers', label: 'Преподаватели', title: 'Преподаватели', subtitle: 'Сводка', accent: 'var(--tab-accent-journal)', icon: 'user' },
       { key: 'admin-journals', label: 'Журналы', title: 'Журналы', subtitle: 'Все журналы', accent: 'var(--tab-accent-events)', icon: 'journal' },
-      { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' }
+      { key: 'settings', label: t('settings'), title: t('settings'), subtitle: 'Приложение', accent: 'var(--tab-accent-settings)', icon: 'settings' },
+      { key: 'services', label: t('services'), title: t('services'), subtitle: 'Полезное', accent: 'var(--tab-accent-services)', icon: 'grid' }
     );
 
     return tabs;
@@ -2441,6 +2442,15 @@ async function renderServices() {
       { key: 'starostas', icon: '👥', color: '#5856d6', title: 'Каталог старост', desc: 'Все старосты' },
       { key: 'links', icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки', desc: 'ЭИОС, библиотеки' }
     );
+  } else if (state.user.role === 'admin') {
+  services.push(
+      { key: 'search',      icon: '🔍', color: '#5856d6', title: 'Поиск расписания',   desc: 'Группы и преподаватели' },
+      { key: 'teachers',    icon: '👨‍🏫', color: '#34c759', title: 'Все преподаватели',  desc: 'С фильтром по факультету' },
+      { key: 'starostas',   icon: '👥', color: '#5856d6', title: 'Каталог старост',    desc: 'Все старосты' },
+      { key: 'campus',      icon: '🗺️', color: '#8e8e93', title: 'Карта корпусов',     desc: 'Яндекс + планы' },
+      { key: 'dormitories', icon: '🏠', color: '#af52de', title: 'Общежития',          desc: 'Адреса и телефоны' },
+      { key: 'links',       icon: '🔗', color: '#ff2d55', title: 'Полезные ссылки',    desc: 'ЭИОС, библиотеки' }
+    );
   }
 
   var group = el('div', { class: 'group' });
@@ -3366,13 +3376,36 @@ async function renderAdminOverview() {
     { label: 'Объявления', value: data.announcements, icon: '📢', color: 'var(--red)' }
   ];
 
-  var statsGrid = el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 16px 20px;' });
-  stats.forEach(function(s) {
-    statsGrid.appendChild(el('div', { style: 'background: var(--gray-bg); border-radius: 16px; padding: 14px; text-align: center;' }, [
+var statsGrid = el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 16px 20px;' });
+
+// Какая вкладка открывается по клику
+var tileTargets = {
+  'Факультеты':     null,
+  'Группы':         'admin-groups',
+  'Студенты':       'admin-students',
+  'Преподаватели':  'admin-teachers',
+  'Кураторы':       'admin-teachers',
+  'Старосты':       'admin-students',
+  'Журналы':        'admin-journals',
+  'Объявления':     null
+};
+
+stats.forEach(function(s) {
+  var target = tileTargets[s.label];
+  var tile = el('div', {
+      style: 'background: var(--gray-bg); border-radius: 16px; padding: 14px; text-align: center;' +
+            (target ? ' cursor: pointer; transition: transform 0.15s, background 0.15s;' : '')
+    }, [
       el('div', { style: 'font-size: 24px; margin-bottom: 4px;', text: s.icon }),
       el('div', { style: 'font-size: 28px; font-weight: 700; color: ' + s.color + ';', text: String(s.value) }),
       el('div', { style: 'font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-top: 2px;', text: s.label })
-    ]));
+    ]);
+    if (target) {
+      tile.addEventListener('mouseenter', function() { tile.style.background = 'rgba(120,120,128,0.2)'; });
+      tile.addEventListener('mouseleave', function() { tile.style.background = 'var(--gray-bg)'; });
+      tile.addEventListener('click', function() { switchTab(target); });
+    }
+    statsGrid.appendChild(tile);
   });
   grid.appendChild(statsGrid);
   main.appendChild(grid);
@@ -3492,27 +3525,60 @@ async function renderAdminStudents() {
   ]));
 
   // Поиск
-  var searchRow = el('div', { class: 'filter-row' });
+  var faculties = await api('/api/faculties');   // если маршрут есть
+  var filterRow = el('div', { class: 'filter-row' });
   var searchInput = el('input', { type: 'text', placeholder: 'Поиск по ФИО или группе' });
-  searchRow.appendChild(searchInput);
-  head.appendChild(searchRow);
-  main.appendChild(head);
+
+  // Селект факультета. Собираем факультеты из самих студентов.
+  var facMap = {};
+  students.forEach(function(s) {
+    var key = s.facultyId || s.facultyName;
+    if (key) facMap[key] = s.facultyName || s.facultyId;
+  });
+  var facSelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
+    Object.keys(facMap).sort(function(a, b) {
+      return String(facMap[a]).localeCompare(String(facMap[b]));
+    }).map(function(key) {
+      return el('option', { value: key, text: facMap[key] });
+    })
+  ));
+
+  filterRow.appendChild(searchInput);
+  filterRow.appendChild(facSelect);
+  var facSelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
+    faculties.map(function(f) { return el('option', { value: f.id, text: f.shortName || f.name }); })
+  ));
+  filterRow.appendChild(searchInput);
+  filterRow.appendChild(facSelect);
+  head.appendChild(filterRow);
 
   var listBlock = el('div', { class: 'group' });
   main.appendChild(listBlock);
 
-  function render(filter) {
+  function render() {
     listBlock.innerHTML = '';
-    var q = (filter || '').toLowerCase();
-    var filtered = students.filter(function(s) {
-      if (!q) return true;
-      return (s.fullName + ' ' + s.group).toLowerCase().indexOf(q) !== -1;
+    var q = (searchInput.value || '').trim().toLowerCase();
+    var fac = facSelect.value;
+
+    var filtered = teachers.filter(function(t) {
+      if (fac) {
+        var key = t.facultyId || t.facultyName;
+        if (key !== fac) return false;
+      }
+      if (q) {
+        if (t.fullName.toLowerCase().indexOf(q) === -1) return false;
+      }
+      return true;
     });
+
     if (!filtered.length) {
-      listBlock.appendChild(el('div', { class: 'empty', text: 'Никого не найдено' }));
+      listBlock.appendChild(el('div', { class: 'group' }, [
+        el('div', { class: 'empty', text: 'Никого не найдено' })
+      ]));
       return;
     }
-    filtered.forEach(function(s) {
+
+    filtered.forEach(function(t) {
       listBlock.appendChild(el('div', { class: 'row clickable', onclick: function() { openUserProfile(s.id); } }, [
         el('div', { style: 'flex: 1; min-width: 0;' }, [
           el('div', { style: 'font-weight: 500; font-size: 15px;' }, [
@@ -3525,8 +3591,9 @@ async function renderAdminStudents() {
       ]));
     });
   }
-  render('');
-  searchInput.addEventListener('input', function() { render(searchInput.value); });
+  render();
+  searchInput.addEventListener('input', render);
+  facSelect.addEventListener('change', render);
 }
 
 // ============================================================
@@ -3543,7 +3610,23 @@ async function renderAdminTeachers() {
   ]));
   var searchRow = el('div', { class: 'filter-row' });
   var searchInput = el('input', { type: 'text', placeholder: 'Поиск по ФИО' });
+
+  // Селект факультета — собираем из преподавателей
+  var facMap = {};
+  teachers.forEach(function(t) {
+    var key = t.facultyId || t.facultyName;
+    if (key) facMap[key] = t.facultyName || t.facultyId;
+  });
+  var facSelect = el('select', {}, [el('option', { value: '', text: 'Все факультеты' })].concat(
+    Object.keys(facMap).sort(function(a, b) {
+      return String(facMap[a]).localeCompare(String(facMap[b]));
+    }).map(function(key) {
+      return el('option', { value: key, text: facMap[key] });
+    })
+  ));
+
   searchRow.appendChild(searchInput);
+  searchRow.appendChild(facSelect);
   head.appendChild(searchRow);
   main.appendChild(head);
 
@@ -3572,8 +3655,9 @@ async function renderAdminTeachers() {
       ]));
     });
   }
-  render('');
-  searchInput.addEventListener('input', function() { render(searchInput.value); });
+  render();
+  searchInput.addEventListener('input', render);
+  facSelect.addEventListener('change', render);
 }
 
 // ============================================================
