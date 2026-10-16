@@ -1600,7 +1600,7 @@ app.get('/api/curator/student/:id/summary', auth, requireRole('curator'), async 
 //  ПРЕДМЕТЫ ПРЕПОДАВАТЕЛЯ (из его расписания)
 // ============================================================
 
-app.get('/api/teacher/my-subjects', auth, requireRole('teacher', 'curator'), async (req, res) => {
+app.get('/api/teacher/my-subjects', auth, requireRole('teacher', 'curator', 'admin'), async (req, res) => {
   const scheduleData = await readJSON('schedule.json');
   const allSchedule = scheduleData?.schedule || {};
 
